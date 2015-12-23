@@ -2,7 +2,7 @@
 
 namespace TwitchPure.UI.Views
 {
-  [View(PageTokens.Browse, typeof(BrowseViewModel))]
+  [View(ViewTokens.Browse, typeof(BrowseViewModel))]
   public sealed partial class Browse : IViewModelAwarePage<BrowseViewModel>
   {
     public Browse()
