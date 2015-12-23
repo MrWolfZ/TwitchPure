@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
-using Windows.ApplicationModel.Resources;
-using Windows.UI.Notifications;
 using Windows.UI.Xaml;
 using Autofac;
 using Microsoft.ApplicationInsights;
-using Microsoft.VisualBasic;
 using Prism.Mvvm;
-using Prism.Windows.AppModel;
+using TwitchPure.UI;
 
 namespace TwitchPure
 {
@@ -30,6 +27,8 @@ namespace TwitchPure
       this.InitializeComponent();
     }
 
+    private IDictionary<string, Type> ViewRegistrations { get; } = new Dictionary<string, Type>();
+
     protected override async Task OnLaunchApplicationAsync(LaunchActivatedEventArgs args)
     {
       await Task.Yield();
@@ -38,12 +37,12 @@ namespace TwitchPure
       {
         // The app was launched from a Secondary Tile
         // Navigate to the item's page
-        this.NavigationService.Navigate("ItemDetail", args.Arguments);
+        this.NavigationService.Navigate(ViewTokens.Browse, args.Arguments);
       }
       else
       {
         // Navigate to the initial page
-        this.NavigationService.Navigate("Hub", null);
+        this.NavigationService.Navigate(ViewTokens.Browse, null);
       }
 
       Window.Current.Activate();
@@ -57,37 +56,28 @@ namespace TwitchPure
 
     protected override void ConfigureContainer(ContainerBuilder builder)
     {
-      builder.RegisterInstance<IResourceLoader>(new ResourceLoaderAdapter(new ResourceLoader()));
+      // builder.RegisterInstance<IResourceLoader>(new ResourceLoaderAdapter(new ResourceLoader()));
+
+      builder.RegisterModule<UIModule>();
 
       base.ConfigureContainer(builder);
     }
 
     protected override Type GetPageType(string pageToken)
     {
-      return base.GetPageType(pageToken);
+      Type t;
+      return this.ViewRegistrations.TryGetValue(pageToken, out t) ? t : base.GetPageType(pageToken);
     }
 
     protected override Task OnInitializeAsync(IActivatedEventArgs args)
     {
-      ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver(
-        viewType =>
-        {
-          var viewModelTypeName = string.Format(
-            CultureInfo.InvariantCulture,
-            "AdventureWorks.UILogic.ViewModels.{0}ViewModel, AdventureWorks.UILogic, Version=1.1.0.0, Culture=neutral",
-            viewType.Name);
-          var viewModelType = Type.GetType(viewModelTypeName);
-          if (viewModelType == null)
-          {
-            viewModelTypeName = string.Format(
-              CultureInfo.InvariantCulture,
-              "AdventureWorks.UILogic.ViewModels.{0}ViewModel, AdventureWorks.UILogic.Windows, Version=1.0.0.0, Culture=neutral",
-              viewType.Name);
-            viewModelType = Type.GetType(viewModelTypeName);
-          }
+      var registrations = this.Container.Resolve<IEnumerable<ViewRegistration>>().ToDictionary(r => r.ViewType, r => r);
+      foreach (var r in registrations.Values)
+      {
+        this.ViewRegistrations.Add(r.Token, r.ViewType);
+      }
 
-          return viewModelType;
-        });
+      ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver(viewType => registrations[viewType].ViewModelType);
 
       // Documentation on working with tiles can be found at http://go.microsoft.com/fwlink/?LinkID=288821&clcid=0x409
       //var _tileUpdater = TileUpdateManager.CreateTileUpdaterForApplication();
