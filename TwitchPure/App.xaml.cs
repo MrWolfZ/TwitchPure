@@ -8,6 +8,7 @@ using Windows.UI.Xaml;
 using Autofac;
 using Microsoft.ApplicationInsights;
 using Prism.Mvvm;
+using TwitchPure.Services;
 using TwitchPure.UI;
 
 namespace TwitchPure
@@ -59,6 +60,7 @@ namespace TwitchPure
       // builder.RegisterInstance<IResourceLoader>(new ResourceLoaderAdapter(new ResourceLoader()));
 
       builder.RegisterModule<UIModule>();
+      builder.RegisterModule<ServicesModule>();
 
       base.ConfigureContainer(builder);
     }

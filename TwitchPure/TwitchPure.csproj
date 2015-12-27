@@ -130,6 +130,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TwitchPure.Services\TwitchPure.Services.csproj">
+      <Project>{68E8BFE5-AF2B-40F4-B14B-72F68CBB02B9}</Project>
+      <Name>TwitchPure.Services</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TwitchPure.UI\TwitchPure.UI.csproj">
       <Project>{44a6e6b1-927e-4697-b77e-cf653fbe840d}</Project>
       <Name>TwitchPure.UI</Name>

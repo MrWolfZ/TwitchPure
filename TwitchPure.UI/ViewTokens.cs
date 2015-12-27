@@ -2,6 +2,6 @@
 {
   public static class ViewTokens
   {
-    public const string Browse = "Browse";
+    public const string Browse = "Template";
   }
 }
