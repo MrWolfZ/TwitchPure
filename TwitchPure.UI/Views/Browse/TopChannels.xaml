@@ -1,4 +1,4 @@
-﻿<Page x:Class="TwitchPure.UI.Views.Browse.TopStreams"
+﻿<Page x:Class="TwitchPure.UI.Views.Browse.TopChannels"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,7 +7,7 @@
       xmlns:viewModels="using:TwitchPure.UI.ViewModels.Browse"
       xmlns:controls="using:TwitchPure.UI.Controls"
       mc:Ignorable="d"
-      d:DataContext="{d:DesignInstance viewModels:TopStreamsViewModel}"
+      d:DataContext="{d:DesignInstance viewModels:TopChannelsViewModel}"
       prismMvvm:ViewModelLocator.AutoWireViewModel="True">
 
   <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -19,7 +19,7 @@
           <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Top Streams" Margin="12,12,0,0" Style="{StaticResource BaseTextBlockStyle}" />
+        <TextBlock x:Uid="TopChannes_Header" Margin="12,12,0,0" Style="{StaticResource BaseTextBlockStyle}" />
 
         <controls:StreamList Grid.Row="1" DataContext="{Binding StreamListViewModel}" />
       </Grid>

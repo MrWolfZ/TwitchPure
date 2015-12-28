@@ -53,7 +53,7 @@ namespace TwitchPure
       else
       {
         // Navigate to the initial page
-        const string InitialPage = ViewToken.TopStreams;
+        const string InitialPage = ViewToken.TopChannels;
         this.NavigationService.Navigate(InitialPage, JsonConvert.SerializeObject(new NavigationArgs { TargetViewToken = InitialPage }));
       }
 
@@ -68,8 +68,6 @@ namespace TwitchPure
 
     protected override void ConfigureContainer(ContainerBuilder builder)
     {
-      // builder.RegisterInstance<IResourceLoader>(new ResourceLoaderAdapter(new ResourceLoader()));
-
       builder.RegisterModule<LoggingModule>()
              .RegisterModule<UIModule>()
              .RegisterModule<ServicesModule>();

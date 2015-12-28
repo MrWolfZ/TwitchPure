@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.Serialization;
 using Windows.UI.Xaml.Controls;
 using MetroLog;
 using Newtonsoft.Json;
-using Prism.Logging;
+using Prism.Windows.AppModel;
 using Prism.Windows.Navigation;
 using ReactiveUI;
 
@@ -18,14 +19,14 @@ namespace TwitchPure.UI.ViewModels.Controls
 
     private readonly IDictionary<string, NavLink> topNavLinks = new Dictionary<string, NavLink>
     {
-      { ViewToken.Favorites, new NavLink { Label = "Navbar.Favorites", Symbol = Symbol.Favorite, ViewToken = ViewToken.Favorites } },
-      { ViewToken.TopStreams, new NavLink { Label = "Navbar.TopStreams", Symbol = Symbol.Admin, ViewToken = ViewToken.TopStreams } }
+      { ViewToken.Favorites, new NavLink { Label = "Navbar_Favorites", Symbol = Symbol.OutlineStar, ViewToken = ViewToken.Favorites } },
+      { ViewToken.TopGames, new NavLink { Label = "Navbar_TopGames", Symbol = Symbol.Caption, ViewToken = ViewToken.TopGames } },
+      { ViewToken.TopChannels, new NavLink { Label = "Navbar_TopChannels", Symbol = Symbol.PreviewLink, ViewToken = ViewToken.TopChannels } }
     };
 
-    // ReSharper disable once CollectionNeverQueried.Local
     private readonly IDictionary<string, NavLink> bottomNavLinks = new Dictionary<string, NavLink>
     {
-      { ViewToken.Settings, new NavLink { Label = "Navbar.Settings", Symbol = Symbol.Setting, ViewToken = ViewToken.Settings } }
+      { ViewToken.Settings, new NavLink { Label = "Navbar_Settings", Symbol = Symbol.Setting, ViewToken = ViewToken.Settings } }
     };
 
     private readonly ObservableAsPropertyHelper<ListViewSelectionMode> topListSelectionMode;
@@ -35,9 +36,14 @@ namespace TwitchPure.UI.ViewModels.Controls
     private NavLink bottomSelectedLink;
     private object nestedDataContext;
 
-    public ShellViewModel(INavigationService navigationService, IFrameFacade frame, ILogger log)
+    public ShellViewModel(INavigationService navigationService, IFrameFacade frame, ILogger log, IResourceLoader resourceLoader)
     {
       this.log = log;
+
+      foreach (var navLink in this.topNavLinks.Values.Concat(this.bottomNavLinks.Values))
+      {
+        navLink.Label = resourceLoader.GetString(navLink.Label);
+      }
 
       this.TopNavLinks = this.topNavLinks.Values;
       this.BottomNavLinks = this.bottomNavLinks.Values;

@@ -117,7 +117,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="NavbarFavorites.Text" xml:space="preserve">
+  <data name="Navbar_Favorites" xml:space="preserve">
     <value>Favorites</value>
+  </data>
+  <data name="Navbar_TopGames" xml:space="preserve">
+    <value>Top Games</value>
+  </data>
+  <data name="Navbar_TopChannels" xml:space="preserve">
+    <value>Top Channels</value>
+  </data>
+  <data name="Navbar_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="TopChannes_Header.Text" xml:space="preserve">
+    <value>Top Channels</value>
   </data>
 </root>

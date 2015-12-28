@@ -138,10 +138,10 @@
     <Compile Include="ViewToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UIModule.cs" />
-    <Compile Include="ViewModels\Browse\TopStreamsViewModel.cs" />
+    <Compile Include="ViewModels\Browse\TopChannelsViewModel.cs" />
     <Compile Include="ViewRegistration.cs" />
-    <Compile Include="Views\Browse\TopStreams.xaml.cs">
-      <DependentUpon>TopStreams.xaml</DependentUpon>
+    <Compile Include="Views\Browse\TopChannels.xaml.cs">
+      <DependentUpon>TopChannels.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\IViewModelAwarePage.cs" />
     <EmbeddedResource Include="Properties\TwitchPure.UI.rd.xml" />
@@ -163,7 +163,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Browse\TopStreams.xaml">
+    <Page Include="Views\Browse\TopChannels.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
