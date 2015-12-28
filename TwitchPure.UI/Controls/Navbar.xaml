@@ -1,0 +1,51 @@
+﻿<ContentControl x:Class="TwitchPure.UI.Controls.Navbar"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:viewModels="using:TwitchPure.UI.ViewModels.Controls"
+                xmlns:controls="using:TwitchPure.UI.Controls"
+                mc:Ignorable="d"
+                d:DataContext="{d:DesignInstance viewModels:NavbarViewModel}">
+  <ContentControl.Template>
+    <ControlTemplate TargetType="controls:Navbar">
+      <Grid>
+        <Grid.Resources>
+          <DataTemplate x:Key="Template" x:DataType="viewModels:NavLink">
+            <StackPanel Orientation="Horizontal">
+              <SymbolIcon Symbol="{Binding Symbol}" />
+              <TextBlock Text="{Binding Label}" Margin="24,0,0,0" VerticalAlignment="Center" />
+            </StackPanel>
+          </DataTemplate>
+        </Grid.Resources>
+        <SplitView PaneBackground="#FF2B2B2B" IsPaneOpen="False" OpenPaneLength="192" CompactPaneLength="192" DisplayMode="CompactInline">
+          <SplitView.Pane>
+            <Grid>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
+
+              <ListView Margin="0 0 0 0"
+                        Grid.Row="0"
+                        VerticalAlignment="Stretch"
+                        ItemsSource="{Binding TopNavLinks}"
+                        ItemTemplate="{StaticResource Template}"
+                        SelectionMode="{Binding TopListSelectionMode}"
+                        SelectedItem="{Binding TopSelectedLink, Mode=TwoWay}" />
+              <ListView Margin="0 0 0 0"
+                        Grid.Row="1"
+                        VerticalAlignment="Stretch"
+                        ItemsSource="{Binding BottomNavLinks}"
+                        ItemTemplate="{StaticResource Template}"
+                        SelectionMode="{Binding BottomListSelectionMode}"
+                        SelectedItem="{Binding BottomSelectedLink, Mode=TwoWay}" />
+            </Grid>
+          </SplitView.Pane>
+
+          <ContentPresenter />
+        </SplitView>
+      </Grid>
+    </ControlTemplate>
+  </ContentControl.Template>
+</ContentControl>

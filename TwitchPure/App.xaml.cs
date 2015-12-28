@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
+using Windows.Globalization;
+using Windows.System.UserProfile;
 using Windows.UI.Xaml;
 using Autofac;
 using Microsoft.ApplicationInsights;
@@ -34,16 +36,18 @@ namespace TwitchPure
     {
       await Task.Yield();
 
+      ApplicationLanguages.PrimaryLanguageOverride = GlobalizationPreferences.Languages[0];
+
       if (!string.IsNullOrEmpty(args?.Arguments))
       {
         // The app was launched from a Secondary Tile
         // Navigate to the item's page
-        this.NavigationService.Navigate(ViewTokens.Browse, args.Arguments);
+        this.NavigationService.Navigate(ViewToken.Favorites, args.Arguments);
       }
       else
       {
         // Navigate to the initial page
-        this.NavigationService.Navigate(ViewTokens.Browse, null);
+        this.NavigationService.Navigate(ViewToken.Favorites, null);
       }
 
       Window.Current.Activate();

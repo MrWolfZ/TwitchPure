@@ -105,29 +105,56 @@
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
     <None Include="project.json" />
+    <PRIResource Include="Strings\en-US\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\Navbar.xaml.cs">
+      <DependentUpon>Navbar.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewAttribute.cs" />
-    <Compile Include="ViewModels\Browse\NavLink.cs" />
-    <Compile Include="ViewTokens.cs" />
+    <Compile Include="ViewModels\Browse\FavoritesViewModel.cs" />
+    <Compile Include="ViewModels\Controls\NavbarViewModel.cs" />
+    <Compile Include="ViewModels\Settings\SettingsViewModel.cs" />
+    <Compile Include="Views\Browse\Favorites.xaml.cs">
+      <DependentUpon>Favorites.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Settings\Settings.xaml.cs">
+      <DependentUpon>Settings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UIModule.cs" />
-    <Compile Include="ViewModels\Browse\TemplateViewModel.cs" />
+    <Compile Include="ViewModels\Browse\TopStreamsViewModel.cs" />
     <Compile Include="ViewRegistration.cs" />
-    <Compile Include="Views\Browse\Template.xaml.cs">
-      <DependentUpon>Template.xaml</DependentUpon>
+    <Compile Include="Views\Browse\TopStreams.xaml.cs">
+      <DependentUpon>TopStreams.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\IViewModelAwarePage.cs" />
     <EmbeddedResource Include="Properties\TwitchPure.UI.rd.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\Browse\Template.xaml">
+    <Page Include="Controls\Navbar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Browse\Favorites.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Browse\TopStreams.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Settings\Settings.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Views\Browse\Components\" />
+    <SDKReference Include="BehaviorsXamlSDKManaged, Version=12.0">
+      <Name>Behaviors SDK %28XAML%29</Name>
+    </SDKReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

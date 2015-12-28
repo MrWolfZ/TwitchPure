@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Reflection;
 using Autofac;
+using TwitchPure.UI.ViewModels.Controls;
 using Module = Autofac.Module;
 
 namespace TwitchPure.UI
@@ -18,6 +19,9 @@ namespace TwitchPure.UI
       {
         builder.RegisterInstance(view);
       }
+
+      builder.RegisterType<NavbarViewModel>()
+             .SingleInstance();
 
       base.Load(builder);
     }
