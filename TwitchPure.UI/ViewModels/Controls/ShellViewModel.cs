@@ -123,10 +123,10 @@ namespace TwitchPure.UI.ViewModels.Controls
   [DataContract]
   public class NavigationArgs
   {
-    [DataMember(Name = "TargetViewToken")]
+    [DataMember]
     public string TargetViewToken { get; set; }
 
-    [DataMember(Name = "SourceViewToken")]
+    [DataMember]
     public string SourceViewToken { get; set; }
   }
 

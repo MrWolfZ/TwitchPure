@@ -132,4 +132,7 @@
   <data name="TopChannels_Header.Text" xml:space="preserve">
     <value>Top Channels</value>
   </data>
+  <data name="TopGames_Header.Text" xml:space="preserve">
+    <value>Top Games</value>
+  </data>
 </root>

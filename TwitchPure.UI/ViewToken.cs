@@ -6,5 +6,6 @@
     public const string TopGames = "TopGames";
     public const string TopChannels = "TopChannels";
     public const string Settings = "Settings";
+    public const string Live = "Live";
   }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using ReactiveUI;
 using TwitchPure.Services.Data.Twitch;
@@ -7,11 +8,15 @@ namespace TwitchPure.UI.ViewModels.Browse
 {
   public sealed class TopGamesViewModel : ReactiveObject
   {
-    public TopGamesViewModel(ShellViewModel shellViewModel, ITwitchApi twitchApi)
+    public TopGamesViewModel(
+      ShellViewModel shellViewModel,
+      Func<string, InfiniteReactiveList<StreamThumbnailViewModel>.LoadItemsAsync, StreamListViewModel> streamListViewModelFactory,
+      ITwitchApi twitchApi)
     {
       shellViewModel.NestedDataContext = this;
 
-      this.StreamListViewModel = new StreamListViewModel(
+      this.StreamListViewModel = streamListViewModelFactory(
+        ViewToken.TopGames,
         async (existingCount, requestedCount, token) =>
         {
           var response = await twitchApi.GetTopStreamsAsync(requestedCount, existingCount);

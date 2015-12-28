@@ -33,6 +33,8 @@ namespace TwitchPure.UI
       builder.RegisterType<ShellViewModel>()
              .SingleInstance();
 
+      builder.RegisterType<StreamListViewModel>();
+
       base.Load(builder);
     }
   }

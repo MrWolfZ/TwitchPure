@@ -131,6 +131,7 @@
     <Compile Include="ViewModels\Controls\StreamListViewModel.cs" />
     <Compile Include="ViewModels\Controls\StreamThumbnailViewModel.cs" />
     <Compile Include="ViewModels\Settings\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\Watch\LiveViewModel.cs" />
     <Compile Include="Views\Browse\Favorites.xaml.cs">
       <DependentUpon>Favorites.xaml</DependentUpon>
     </Compile>
@@ -139,6 +140,9 @@
     </Compile>
     <Compile Include="Views\Settings\Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Watch\Live.xaml.cs">
+      <DependentUpon>Live.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -177,6 +181,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Settings\Settings.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Watch\Live.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

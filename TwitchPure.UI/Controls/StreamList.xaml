@@ -23,6 +23,7 @@
               Margin="12 10 0 0"
               SelectionMode="Single"
               ItemsSource="{Binding Streams, Mode=OneTime}"
+              SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
               VerticalAlignment="Stretch">
       <GridView.ItemTemplate>
         <DataTemplate x:DataType="viewModels:StreamThumbnailViewModel">

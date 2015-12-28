@@ -7,7 +7,7 @@
       xmlns:viewModels="using:TwitchPure.UI.ViewModels.Browse"
       xmlns:controls="using:TwitchPure.UI.Controls"
       mc:Ignorable="d"
-      d:DataContext="{d:DesignInstance viewModels:TopChannelsViewModel}"
+      d:DataContext="{d:DesignInstance viewModels:TopGamesViewModel}"
       prismMvvm:ViewModelLocator.AutoWireViewModel="True">
 
   <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -19,7 +19,7 @@
           <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock x:Uid="TopChannels_Header" Margin="12,12,0,0" Style="{StaticResource BaseTextBlockStyle}" />
+        <TextBlock x:Uid="TopGames_Header" Margin="12,12,0,0" Style="{StaticResource BaseTextBlockStyle}" />
 
         <controls:StreamList Grid.Row="1" DataContext="{Binding StreamListViewModel}" />
       </Grid>
