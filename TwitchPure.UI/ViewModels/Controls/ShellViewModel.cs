@@ -31,6 +31,7 @@ namespace TwitchPure.UI.ViewModels.Controls
 
     private readonly ObservableAsPropertyHelper<ListViewSelectionMode> topListSelectionMode;
     private readonly ObservableAsPropertyHelper<ListViewSelectionMode> bottomListSelectionMode;
+    private readonly ObservableAsPropertyHelper<bool> isNavbarOpen;
     private readonly CompositeDisposable disposable = new CompositeDisposable();
     private NavLink topSelectedLink;
     private NavLink bottomSelectedLink;
@@ -47,6 +48,8 @@ namespace TwitchPure.UI.ViewModels.Controls
 
       this.TopNavLinks = this.topNavLinks.Values;
       this.BottomNavLinks = this.bottomNavLinks.Values;
+
+      this.isNavbarOpen = Observable.Return(true).ToProperty(this, vm => vm.IsNavbarOpen, true);
 
       var selections = this.WhenAny(vm => vm.TopSelectedLink, c => c.Value)
                            .Merge(this.WhenAny(vm => vm.BottomSelectedLink, c => c.Value))
@@ -94,8 +97,9 @@ namespace TwitchPure.UI.ViewModels.Controls
       set { this.RaiseAndSetIfChanged(ref this.nestedDataContext, value); }
     }
 
-    public ICollection<NavLink> TopNavLinks { get; }
+    public bool IsNavbarOpen => this.isNavbarOpen.Value;
 
+    public ICollection<NavLink> TopNavLinks { get; }
     public ICollection<NavLink> BottomNavLinks { get; }
 
     public ListViewSelectionMode TopListSelectionMode => this.topListSelectionMode.Value;

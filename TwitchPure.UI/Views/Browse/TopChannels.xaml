@@ -19,7 +19,7 @@
           <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock x:Uid="TopChannes_Header" Margin="12,12,0,0" Style="{StaticResource BaseTextBlockStyle}" />
+        <TextBlock x:Uid="TopChannels_Header" Margin="12,12,0,0" Style="{StaticResource BaseTextBlockStyle}" />
 
         <controls:StreamList Grid.Row="1" DataContext="{Binding StreamListViewModel}" />
       </Grid>

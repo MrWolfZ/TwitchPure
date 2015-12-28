@@ -6,37 +6,88 @@
                 xmlns:viewModels="using:TwitchPure.UI.ViewModels.Controls"
                 xmlns:controls="using:TwitchPure.UI.Controls"
                 xmlns:mvvm="using:Prism.Windows.Mvvm"
+                xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+                xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+                xmlns:converters="using:TwitchPure.UI.Converters"
                 mc:Ignorable="d"
                 d:DataContext="{d:DesignInstance viewModels:ShellViewModel}"
                 mvvm:ViewModelLocator.AutoWireViewModel="True">
   <ContentControl.Template>
     <ControlTemplate TargetType="controls:Shell">
-      <Grid>
+      <Grid x:Name="LayoutRoot">
+        <VisualStateManager.VisualStateGroups>
+          <VisualStateGroup x:Name="WindowStates">
+            <VisualState x:Name="Small">
+              <VisualState.StateTriggers>
+                <AdaptiveTrigger MinWindowWidth="200" />
+              </VisualState.StateTriggers>
+              <VisualState.Setters>
+                <Setter Target="Button.Visibility" Value="Visible" />
+                <Setter Target="SplitView.DisplayMode" Value="CompactOverlay" />
+                <Setter Target="SplitView.CompactPaneLength" Value="48" />
+              </VisualState.Setters>
+            </VisualState>
+            <VisualState x:Name="Large">
+              <VisualState.StateTriggers>
+                <AdaptiveTrigger MinWindowWidth="720" />
+              </VisualState.StateTriggers>
+              <VisualState.Setters>
+                <Setter Target="Button.Visibility" Value="Collapsed" />
+                <Setter Target="SplitView.DisplayMode" Value="CompactInline" />
+                <Setter Target="SplitView.CompactPaneLength" Value="192" />
+              </VisualState.Setters>
+            </VisualState>
+          </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        
         <Grid.Resources>
           <DataTemplate x:Key="Template" x:DataType="viewModels:NavLink">
             <StackPanel Orientation="Horizontal">
-              <SymbolIcon Symbol="{Binding Symbol}" />
+              <SymbolIcon Symbol="{Binding Symbol}" Width="24" />
               <TextBlock Text="{Binding Label}" Margin="24,0,0,0" VerticalAlignment="Center" />
             </StackPanel>
           </DataTemplate>
+          <converters:NegationConverter x:Key="NegationConverter" />
         </Grid.Resources>
-        <SplitView PaneBackground="#FF2B2B2B" IsPaneOpen="False" OpenPaneLength="192" CompactPaneLength="192" DisplayMode="CompactInline">
+        <SplitView x:Name="SplitView" PaneBackground="#FF2B2B2B" IsPaneOpen="False" 
+                   OpenPaneLength="192" CompactPaneLength="48" DisplayMode="CompactInline">
+          <interactivity:Interaction.Behaviors>
+            <core:DataTriggerBehavior Binding="{Binding IsPaneOpen, ElementName=SplitView}" Value="True">
+              <core:ChangePropertyAction TargetObject="{Binding ElementName=MenuIcon}" PropertyName="Symbol" Value="ClosePane" />
+            </core:DataTriggerBehavior>
+            <core:DataTriggerBehavior Binding="{Binding IsPaneOpen, ElementName=SplitView}" Value="False">
+              <core:ChangePropertyAction TargetObject="{Binding ElementName=MenuIcon}" PropertyName="Symbol" Value="OpenPane" />
+            </core:DataTriggerBehavior>
+          </interactivity:Interaction.Behaviors>
           <SplitView.Pane>
             <Grid>
               <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
               </Grid.RowDefinitions>
+              
+              <Button x:Name="Button" Width="48" Height="42">
+                <interactivity:Interaction.Behaviors>
+                  <core:EventTriggerBehavior EventName="Tapped">
+                    <core:ChangePropertyAction TargetObject="{Binding ElementName=SplitView}" 
+                                               PropertyName="IsPaneOpen" 
+                                               Value="{Binding IsPaneOpen, ElementName=SplitView, Converter={StaticResource NegationConverter}}" />
+                  </core:EventTriggerBehavior>
+                </interactivity:Interaction.Behaviors>
+                
+                <SymbolIcon x:Name="MenuIcon" Symbol="OpenPane" />
+              </Button>
 
               <ListView Margin="0 0 0 0"
-                        Grid.Row="0"
+                        Grid.Row="1"
                         VerticalAlignment="Stretch"
                         ItemsSource="{Binding TopNavLinks}"
                         ItemTemplate="{StaticResource Template}"
                         SelectionMode="{Binding TopListSelectionMode}"
                         SelectedItem="{Binding TopSelectedLink, Mode=TwoWay}" />
               <ListView Margin="0 0 0 0"
-                        Grid.Row="1"
+                        Grid.Row="2"
                         VerticalAlignment="Stretch"
                         ItemsSource="{Binding BottomNavLinks}"
                         ItemTemplate="{StaticResource Template}"

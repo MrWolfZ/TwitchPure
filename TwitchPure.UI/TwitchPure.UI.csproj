@@ -121,6 +121,7 @@
     </Compile>
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\InverseNullToVisibilityConverter.cs" />
+    <Compile Include="Converters\NegationConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="InfiniteReactiveList.cs" />
     <Compile Include="ViewAttribute.cs" />
