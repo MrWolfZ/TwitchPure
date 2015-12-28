@@ -4,6 +4,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.Serialization;
 using Windows.UI.Xaml.Controls;
+using MetroLog;
 using Newtonsoft.Json;
 using Prism.Logging;
 using Prism.Windows.Navigation;
@@ -13,7 +14,7 @@ namespace TwitchPure.UI.ViewModels.Controls
 {
   public sealed class ShellViewModel : ReactiveObject, IDisposable
   {
-    private readonly ILoggerFacade log;
+    private readonly ILogger log;
 
     private readonly IDictionary<string, NavLink> topNavLinks = new Dictionary<string, NavLink>
     {
@@ -34,7 +35,7 @@ namespace TwitchPure.UI.ViewModels.Controls
     private NavLink bottomSelectedLink;
     private object nestedDataContext;
 
-    public ShellViewModel(INavigationService navigationService, IFrameFacade frame, ILoggerFacade log)
+    public ShellViewModel(INavigationService navigationService, IFrameFacade frame, ILogger log)
     {
       this.log = log;
 
@@ -50,7 +51,7 @@ namespace TwitchPure.UI.ViewModels.Controls
         selections
           .Publish(pub => pub.StartWith((string)null).Zip<string, string, Tuple<string, string>>(pub, Tuple.Create))
           .Select(t => new NavigationArgs { SourceViewToken = t.Item1, TargetViewToken = t.Item2 })
-          .Do(t => this.log.Log($"Navigating from '{t.SourceViewToken}' to '{t.TargetViewToken}'", Category.Debug, Priority.None))
+          .Do(t => this.log.Trace($"Navigating from '{t.SourceViewToken}' to '{t.TargetViewToken}'"))
           .Subscribe(args => navigationService.Navigate(args.TargetViewToken, JsonConvert.SerializeObject(args))));
 
       this.topListSelectionMode = this.WhenAny(vm => vm.BottomSelectedLink, c => c)

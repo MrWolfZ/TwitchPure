@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
@@ -71,8 +70,9 @@ namespace TwitchPure
     {
       // builder.RegisterInstance<IResourceLoader>(new ResourceLoaderAdapter(new ResourceLoader()));
 
-      builder.RegisterModule<UIModule>();
-      builder.RegisterModule<ServicesModule>();
+      builder.RegisterModule<LoggingModule>()
+             .RegisterModule<UIModule>()
+             .RegisterModule<ServicesModule>();
 
       base.ConfigureContainer(builder);
     }
@@ -121,7 +121,24 @@ namespace TwitchPure
     {
       public void Log(string message, Category category, Priority priority)
       {
-        Debug.WriteLine($"{DateTime.Now.ToString("u")} [{category.ToString().ToUpper()}] {message}");
+        var log = LoggingModule.LogManager.GetLogger<App>();
+        switch (category)
+        {
+          case Category.Debug:
+            log.Trace(message);
+            break;
+          case Category.Exception:
+            log.Error(message);
+            break;
+          case Category.Info:
+            log.Info(message);
+            break;
+          case Category.Warn:
+            log.Warn(message);
+            break;
+          default:
+            throw new ArgumentOutOfRangeException(nameof(category), category, null);
+        }
       }
     }
   }
