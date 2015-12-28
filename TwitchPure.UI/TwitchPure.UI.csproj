@@ -126,12 +126,16 @@
     <Compile Include="InfiniteReactiveList.cs" />
     <Compile Include="ViewAttribute.cs" />
     <Compile Include="ViewModels\Browse\FavoritesViewModel.cs" />
+    <Compile Include="ViewModels\Browse\TopGamesViewModel.cs" />
     <Compile Include="ViewModels\Controls\ShellViewModel.cs" />
     <Compile Include="ViewModels\Controls\StreamListViewModel.cs" />
     <Compile Include="ViewModels\Controls\StreamThumbnailViewModel.cs" />
     <Compile Include="ViewModels\Settings\SettingsViewModel.cs" />
     <Compile Include="Views\Browse\Favorites.xaml.cs">
       <DependentUpon>Favorites.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Browse\TopGames.xaml.cs">
+      <DependentUpon>TopGames.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Settings\Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
@@ -163,6 +167,10 @@
     <Page Include="Views\Browse\Favorites.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Browse\TopGames.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Browse\TopChannels.xaml">
       <SubType>Designer</SubType>

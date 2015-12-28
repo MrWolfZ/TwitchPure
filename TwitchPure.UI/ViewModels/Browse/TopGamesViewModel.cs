@@ -1,13 +1,13 @@
-﻿using System.Linq;
+using System.Linq;
 using ReactiveUI;
 using TwitchPure.Services.Data.Twitch;
 using TwitchPure.UI.ViewModels.Controls;
 
 namespace TwitchPure.UI.ViewModels.Browse
 {
-  public sealed class TopChannelsViewModel : ReactiveObject
+  public sealed class TopGamesViewModel : ReactiveObject
   {
-    public TopChannelsViewModel(ShellViewModel shellViewModel, ITwitchApi twitchApi)
+    public TopGamesViewModel(ShellViewModel shellViewModel, ITwitchApi twitchApi)
     {
       shellViewModel.NestedDataContext = this;
 
