@@ -12,7 +12,7 @@
 
 
   <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-    <controls:Shell>
+    <controls:Shell DataContext="{Binding ShellViewModel}">
       <TextBlock Text="Settings" Margin="12,12,0,0" Style="{StaticResource BaseTextBlockStyle}" />
     </controls:Shell>
   </Grid>

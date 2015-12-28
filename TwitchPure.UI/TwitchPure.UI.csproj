@@ -152,7 +152,12 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\TwitchPure.Services\TwitchPure.Services.csproj">
+      <Project>{68e8bfe5-af2b-40f4-b14b-72f68cbb02b9}</Project>
+      <Name>TwitchPure.Services</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <SDKReference Include="BehaviorsXamlSDKManaged, Version=12.0">
       <Name>Behaviors SDK %28XAML%29</Name>

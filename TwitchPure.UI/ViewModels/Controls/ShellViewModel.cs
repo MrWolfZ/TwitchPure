@@ -32,6 +32,7 @@ namespace TwitchPure.UI.ViewModels.Controls
     private readonly CompositeDisposable disposable = new CompositeDisposable();
     private NavLink topSelectedLink;
     private NavLink bottomSelectedLink;
+    private object nestedDataContext;
 
     public ShellViewModel(INavigationService navigationService, IFrameFacade frame, ILoggerFacade log)
     {
@@ -78,6 +79,12 @@ namespace TwitchPure.UI.ViewModels.Controls
         navigations
           .Where(t => this.bottomNavLinks.ContainsKey(t))
           .Subscribe(t => this.BottomSelectedLink = this.bottomNavLinks[t]));
+    }
+
+    public object NestedDataContext
+    {
+      get { return this.nestedDataContext; }
+      set { this.RaiseAndSetIfChanged(ref this.nestedDataContext, value); }
     }
 
     public ICollection<NavLink> TopNavLinks { get; }

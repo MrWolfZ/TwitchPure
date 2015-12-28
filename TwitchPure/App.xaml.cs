@@ -54,7 +54,8 @@ namespace TwitchPure
       else
       {
         // Navigate to the initial page
-        this.NavigationService.Navigate(ViewToken.Favorites, JsonConvert.SerializeObject(new NavigationArgs { TargetViewToken = ViewToken.Favorites }));
+        const string InitialPage = ViewToken.TopStreams;
+        this.NavigationService.Navigate(InitialPage, JsonConvert.SerializeObject(new NavigationArgs { TargetViewToken = InitialPage }));
       }
 
       Window.Current.Activate();
