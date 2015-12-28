@@ -36,6 +36,7 @@ namespace TwitchPure.UI.ViewModels.Controls
     public ShellViewModel(INavigationService navigationService, IFrameFacade frame, ILoggerFacade log)
     {
       this.log = log;
+
       this.TopNavLinks = this.topNavLinks.Values;
       this.BottomNavLinks = this.bottomNavLinks.Values;
 
@@ -46,10 +47,10 @@ namespace TwitchPure.UI.ViewModels.Controls
 
       this.disposable.Add(
         selections
-            .Publish(pub => pub.StartWith((string)null).Zip(pub, Tuple.Create))
-            .Select(t => new NavigationArgs { SourceViewToken = t.Item1, TargetViewToken = t.Item2 })
-            .Do(t => this.log.Log($"Navigating from '{t.SourceViewToken}' to '{t.TargetViewToken}'", Category.Debug, Priority.None))
-            .Subscribe(args => navigationService.Navigate(args.TargetViewToken, JsonConvert.SerializeObject(args))));
+          .Publish(pub => pub.StartWith((string)null).Zip<string, string, Tuple<string, string>>(pub, Tuple.Create))
+          .Select(t => new NavigationArgs { SourceViewToken = t.Item1, TargetViewToken = t.Item2 })
+          .Do(t => this.log.Log($"Navigating from '{t.SourceViewToken}' to '{t.TargetViewToken}'", Category.Debug, Priority.None))
+          .Subscribe(args => navigationService.Navigate(args.TargetViewToken, JsonConvert.SerializeObject(args))));
 
       this.topListSelectionMode = this.WhenAny(vm => vm.BottomSelectedLink, c => c)
                                       .Where(c => c.Value != null)
@@ -61,13 +62,10 @@ namespace TwitchPure.UI.ViewModels.Controls
                                          .SelectMany(c => Observable.Return(ListViewSelectionMode.None).Concat(Observable.Return(ListViewSelectionMode.Single)))
                                          .ToProperty(this, vm => vm.BottomListSelectionMode, ListViewSelectionMode.Single);
 
-      var navigations = Observable.FromEventPattern<NavigatedToEventArgs>(h => frame.NavigatedTo += h, h => frame.NavigatedTo -= h)
-                                  .Select(args => args.EventArgs.Parameter)
-                                  .Cast<string>()
-                                  .Select(JsonConvert.DeserializeObject<NavigationArgs>)
-                                  .Select(args => args.TargetViewToken)
-                                  .Publish()
-                                  .RefCount();
+      var navigations = from e in Observable.FromEventPattern<NavigatedToEventArgs>(h => frame.NavigatedTo += h, h => frame.NavigatedTo -= h)
+                        let p = (string)e.EventArgs.Parameter
+                        let o = JsonConvert.DeserializeObject<NavigationArgs>(p)
+                        select o.TargetViewToken;
 
       this.disposable.Add(navigations.Subscribe(t => navigationService.RemoveAllPages(t)));
 
@@ -105,7 +103,8 @@ namespace TwitchPure.UI.ViewModels.Controls
   }
 
   [DataContract]
-  public class NavigationArgs { 
+  public class NavigationArgs
+  {
     [DataMember(Name = "TargetViewToken")]
     public string TargetViewToken { get; set; }
 

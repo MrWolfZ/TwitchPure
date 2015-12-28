@@ -64,7 +64,6 @@ namespace TwitchPure
     {
       // Set up the list of known types for the SuspensionManager
       this.SessionStateService.RegisterKnownType(typeof(Dictionary<string, Collection<string>>));
-      this.SessionStateService.RegisterKnownType(typeof(NavigationArgs));
     }
 
     protected override void ConfigureContainer(ContainerBuilder builder)
