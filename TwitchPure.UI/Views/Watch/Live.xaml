@@ -5,9 +5,17 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:mvvm="using:Prism.Windows.Mvvm"
       xmlns:watch="using:TwitchPure.UI.ViewModels.Watch"
+      xmlns:playerFramework="using:Microsoft.PlayerFramework"
+      xmlns:adaptive="using:Microsoft.PlayerFramework.Adaptive"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance watch:LiveViewModel}"
       mvvm:ViewModelLocator.AutoWireViewModel="True">
   <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <playerFramework:MediaPlayer Source="{Binding MediaUri}"
+                                 InteractiveActivationMode="None">
+      <playerFramework:MediaPlayer.Plugins>
+        <adaptive:AdaptivePlugin />
+      </playerFramework:MediaPlayer.Plugins>
+    </playerFramework:MediaPlayer>
   </Grid>
 </Page>
