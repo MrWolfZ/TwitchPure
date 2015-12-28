@@ -6,8 +6,6 @@
       xmlns:prismMvvm="using:Prism.Windows.Mvvm"
       xmlns:viewModels="using:TwitchPure.UI.ViewModels.Browse"
       xmlns:controls="using:TwitchPure.UI.Controls"
-      xmlns:controlVms="using:TwitchPure.UI.ViewModels.Controls"
-      xmlns:converters="using:TwitchPure.UI.Converters"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance viewModels:TopStreamsViewModel}"
       prismMvvm:ViewModelLocator.AutoWireViewModel="True">
@@ -16,38 +14,14 @@
     <controls:Shell>
       <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
       <Grid DataContext="{Binding NestedDataContext}">
-        <Grid.Resources>
-          <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        </Grid.Resources>
-        
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
           <RowDefinition Height="*" />
-          <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <TextBlock Text="Top Streams" Margin="12,12,0,0" Style="{StaticResource BaseTextBlockStyle}" />
 
-        <GridView Grid.Row="1"
-                  ScrollViewer.HorizontalScrollMode="Disabled"
-                  Margin="12 10 0 0"
-                  SelectionMode="Single"
-                  ItemsSource="{Binding Streams, Mode=OneTime}"
-                  VerticalAlignment="Stretch">
-          <GridView.ItemTemplate>
-            <DataTemplate x:DataType="controlVms:StreamThumbnailViewModel">
-              <controls:StreamThumbnail DataContext="{Binding}" />
-            </DataTemplate>
-          </GridView.ItemTemplate>
-        </GridView>
-
-        <ProgressRing Grid.Row="2"
-                      IsActive="True"
-                      Margin="8 0 8 8"
-                      HorizontalAlignment="Center"
-                      Height="50"
-                      Width="50"
-                      Visibility="{Binding Streams.IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <controls:StreamList Grid.Row="1" DataContext="{Binding StreamListViewModel}" />
       </Grid>
     </controls:Shell>
   </Grid>
