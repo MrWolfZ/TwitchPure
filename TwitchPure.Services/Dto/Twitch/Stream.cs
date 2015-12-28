@@ -6,7 +6,7 @@ namespace TwitchPure.Services.Dto.Twitch
   [DataContract]
   public sealed class StreamsResponse
   {
-    [DataMember(Name = "total")]
+    [DataMember(Name = "_total")]
     public int Total { get; set; }
 
     [DataMember(Name = "streams")]

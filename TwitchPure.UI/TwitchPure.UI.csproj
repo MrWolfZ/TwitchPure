@@ -116,6 +116,7 @@
     <Compile Include="Controls\StreamThumbnail.xaml.cs">
       <DependentUpon>StreamThumbnail.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\InverseNullToVisibilityConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="ViewAttribute.cs" />
