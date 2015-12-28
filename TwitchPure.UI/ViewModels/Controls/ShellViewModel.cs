@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Runtime.Serialization;
 using Windows.UI.Xaml.Controls;
+using Newtonsoft.Json;
+using Prism.Logging;
 using Prism.Windows.Navigation;
 using ReactiveUI;
 
@@ -10,6 +13,8 @@ namespace TwitchPure.UI.ViewModels.Controls
 {
   public sealed class ShellViewModel : ReactiveObject, IDisposable
   {
+    private readonly ILoggerFacade log;
+
     private readonly IDictionary<string, NavLink> topNavLinks = new Dictionary<string, NavLink>
     {
       { ViewToken.Favorites, new NavLink { Label = "Navbar.Favorites", Symbol = Symbol.Favorite, ViewToken = ViewToken.Favorites } },
@@ -28,18 +33,23 @@ namespace TwitchPure.UI.ViewModels.Controls
     private NavLink topSelectedLink;
     private NavLink bottomSelectedLink;
 
-    public ShellViewModel(INavigationService navigationService, IFrameFacade frame)
+    public ShellViewModel(INavigationService navigationService, IFrameFacade frame, ILoggerFacade log)
     {
+      this.log = log;
       this.TopNavLinks = this.topNavLinks.Values;
       this.BottomNavLinks = this.bottomNavLinks.Values;
 
+      var selections = this.WhenAny(vm => vm.TopSelectedLink, c => c.Value)
+                           .Merge(this.WhenAny(vm => vm.BottomSelectedLink, c => c.Value))
+                           .Where(link => link != null)
+                           .Select(link => link.ViewToken);
+
       this.disposable.Add(
-        this.WhenAny(vm => vm.TopSelectedLink, c => c.Value)
-            .Merge(this.WhenAny(vm => vm.BottomSelectedLink, c => c.Value))
-            .Where(link => link != null)
-            .DistinctUntilChanged()
-            .Select(link => link.ViewToken)
-            .Subscribe(t => navigationService.Navigate(t, new NavigationArgs { TargetViewToken = t })));
+        selections
+            .Publish(pub => pub.StartWith((string)null).Zip(pub, Tuple.Create))
+            .Select(t => new NavigationArgs { SourceViewToken = t.Item1, TargetViewToken = t.Item2 })
+            .Do(t => this.log.Log($"Navigating from '{t.SourceViewToken}' to '{t.TargetViewToken}'", Category.Debug, Priority.None))
+            .Subscribe(args => navigationService.Navigate(args.TargetViewToken, JsonConvert.SerializeObject(args))));
 
       this.topListSelectionMode = this.WhenAny(vm => vm.BottomSelectedLink, c => c)
                                       .Where(c => c.Value != null)
@@ -53,7 +63,8 @@ namespace TwitchPure.UI.ViewModels.Controls
 
       var navigations = Observable.FromEventPattern<NavigatedToEventArgs>(h => frame.NavigatedTo += h, h => frame.NavigatedTo -= h)
                                   .Select(args => args.EventArgs.Parameter)
-                                  .Cast<NavigationArgs>()
+                                  .Cast<string>()
+                                  .Select(JsonConvert.DeserializeObject<NavigationArgs>)
                                   .Select(args => args.TargetViewToken)
                                   .Publish()
                                   .RefCount();
@@ -93,9 +104,12 @@ namespace TwitchPure.UI.ViewModels.Controls
     public void Dispose() => this.disposable.Dispose();
   }
 
-  public class NavigationArgs
-  {
+  [DataContract]
+  public class NavigationArgs { 
+    [DataMember(Name = "TargetViewToken")]
     public string TargetViewToken { get; set; }
+
+    [DataMember(Name = "SourceViewToken")]
     public string SourceViewToken { get; set; }
   }
 

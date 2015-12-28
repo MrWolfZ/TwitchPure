@@ -2,6 +2,7 @@
   "dependencies": {
     "Autofac": "3.5.2",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+    "Newtonsoft.Json": "7.0.1",
     "Prism.Windows": "6.0.1",
     "reactiveui": "6.5.0",
     "Splat": "1.6.2"

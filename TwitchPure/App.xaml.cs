@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
@@ -10,6 +11,8 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Autofac;
 using Microsoft.ApplicationInsights;
+using Newtonsoft.Json;
+using Prism.Logging;
 using Prism.Mvvm;
 using Prism.Windows.Navigation;
 using TwitchPure.Services;
@@ -51,7 +54,7 @@ namespace TwitchPure
       else
       {
         // Navigate to the initial page
-        this.NavigationService.Navigate(ViewToken.Favorites, new NavigationArgs { TargetViewToken = ViewToken.Favorites });
+        this.NavigationService.Navigate(ViewToken.Favorites, JsonConvert.SerializeObject(new NavigationArgs { TargetViewToken = ViewToken.Favorites }));
       }
 
       Window.Current.Activate();
@@ -110,6 +113,16 @@ namespace TwitchPure
       //_tileUpdater.StartPeriodicUpdate(new Uri(Constants.ServerAddress + "/api/TileNotification"), PeriodicUpdateRecurrence.HalfHour);
 
       return base.OnInitializeAsync(args);
+    }
+
+    protected override ILoggerFacade CreateLogger() => new DebugLogger();
+
+    private sealed class DebugLogger : ILoggerFacade
+    {
+      public void Log(string message, Category category, Priority priority)
+      {
+        Debug.WriteLine($"{DateTime.Now.ToString("u")} [{category.ToString().ToUpper()}] {message}");
+      }
     }
   }
 }
