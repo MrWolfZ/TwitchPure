@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Linq;
 using Prism.Logging;
 using ReactiveUI;
 using TwitchPure.Services.Data.Twitch;
-using TwitchPure.Services.Dto.Twitch;
 using TwitchPure.UI.ViewModels.Controls;
 
 namespace TwitchPure.UI.ViewModels.Browse
@@ -17,11 +17,14 @@ namespace TwitchPure.UI.ViewModels.Browse
       this.twitchApi = twitchApi;
       shellViewModel.NestedDataContext = this;
 
-      Observable.FromAsync(twitchApi.GetTopStreamsAsync).ObserveOn(RxApp.MainThreadScheduler).Subscribe(streams => this.Streams.AddRange(streams));
+      Observable.FromAsync(twitchApi.GetTopStreamsAsync)
+                .Select(col => col.Select(dto => new StreamThumbnailViewModel(dto)))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(streams => this.Streams.AddRange(streams));
     }
 
     public string String { get; } = "wut";
 
-    public IReactiveList<Stream> Streams { get; } = new ReactiveList<Stream>();
+    public IReactiveList<StreamThumbnailViewModel> Streams { get; } = new ReactiveList<StreamThumbnailViewModel>();
   }
 }

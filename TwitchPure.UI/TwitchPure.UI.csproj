@@ -113,9 +113,15 @@
     <Compile Include="Controls\Shell.xaml.cs">
       <DependentUpon>Shell.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\StreamThumbnail.xaml.cs">
+      <DependentUpon>StreamThumbnail.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Converters\InverseNullToVisibilityConverter.cs" />
+    <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="ViewAttribute.cs" />
     <Compile Include="ViewModels\Browse\FavoritesViewModel.cs" />
     <Compile Include="ViewModels\Controls\ShellViewModel.cs" />
+    <Compile Include="ViewModels\Controls\StreamThumbnailViewModel.cs" />
     <Compile Include="ViewModels\Settings\SettingsViewModel.cs" />
     <Compile Include="Views\Browse\Favorites.xaml.cs">
       <DependentUpon>Favorites.xaml</DependentUpon>
@@ -136,6 +142,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Controls\Shell.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\StreamThumbnail.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

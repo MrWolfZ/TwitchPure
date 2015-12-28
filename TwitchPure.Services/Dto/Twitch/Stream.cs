@@ -17,13 +17,16 @@ namespace TwitchPure.Services.Dto.Twitch
   public sealed class Stream
   {
     [DataMember(Name = "game")]
-     public string Game { get; set; }
+    public string Game { get; set; }
 
     [DataMember(Name = "viewers")]
     public int Viewers { get; set; }
 
     [DataMember(Name = "channel")]
     public Channel Channel { get; set; }
+
+    [DataMember(Name = "preview")]
+    public Preview Preview { get; set; }
   }
 
   [DataContract]
@@ -31,5 +34,18 @@ namespace TwitchPure.Services.Dto.Twitch
   {
     [DataMember(Name = "display_name")]
     public string DisplayName { get; set; }
+  }
+
+  [DataContract]
+  public sealed class Preview
+  {
+    [DataMember(Name = "small")]
+    public string Small { get; set; }
+
+    [DataMember(Name = "medium")]
+    public string Medium { get; set; }
+
+    [DataMember(Name = "large")]
+    public string Large { get; set; }
   }
 }
