@@ -1,14 +1,16 @@
-﻿<ContentControl x:Class="TwitchPure.UI.Controls.Navbar"
+﻿<ContentControl x:Class="TwitchPure.UI.Controls.Shell"
                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                 xmlns:viewModels="using:TwitchPure.UI.ViewModels.Controls"
                 xmlns:controls="using:TwitchPure.UI.Controls"
+                xmlns:mvvm="using:Prism.Windows.Mvvm"
                 mc:Ignorable="d"
-                d:DataContext="{d:DesignInstance viewModels:NavbarViewModel}">
+                d:DataContext="{d:DesignInstance viewModels:ShellViewModel}"
+                mvvm:ViewModelLocator.AutoWireViewModel="True">
   <ContentControl.Template>
-    <ControlTemplate TargetType="controls:Navbar">
+    <ControlTemplate TargetType="controls:Shell">
       <Grid>
         <Grid.Resources>
           <DataTemplate x:Key="Template" x:DataType="viewModels:NavLink">

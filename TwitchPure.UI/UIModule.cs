@@ -10,17 +10,23 @@ namespace TwitchPure.UI
   {
     protected override void Load(ContainerBuilder builder)
     {
-      var views = from t in this.GetType().GetTypeInfo().Assembly.GetTypes()
-                  let a = t.GetTypeInfo().GetCustomAttribute<ViewAttribute>()
-                  where a != null
-                  select new ViewRegistration(a.Token, t, a.ViewModelType);
-
-      foreach (var view in views)
+      foreach (var view in from t in this.GetType().GetTypeInfo().Assembly.GetTypes()
+                           let a = t.GetTypeInfo().GetCustomAttribute<ViewAttribute>()
+                           where a != null
+                           select new ViewRegistration(a.Token, t, a.ViewModelType))
       {
         builder.RegisterInstance(view);
       }
 
-      builder.RegisterType<NavbarViewModel>()
+      foreach (var view in from t in this.GetType().GetTypeInfo().Assembly.GetTypes()
+                           let a = t.GetTypeInfo().GetCustomAttribute<ControlAttribute>()
+                           where a != null
+                           select new ControlRegistration(t, a.ViewModelType))
+      {
+        builder.RegisterInstance(view);
+      }
+
+      builder.RegisterType<ShellViewModel>()
              .SingleInstance();
 
       base.Load(builder);

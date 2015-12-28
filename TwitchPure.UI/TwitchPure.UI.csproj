@@ -108,12 +108,14 @@
     <PRIResource Include="Strings\en-US\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\Navbar.xaml.cs">
-      <DependentUpon>Navbar.xaml</DependentUpon>
+    <Compile Include="ControlAttribute.cs" />
+    <Compile Include="ControlRegistration.cs" />
+    <Compile Include="Controls\Shell.xaml.cs">
+      <DependentUpon>Shell.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewAttribute.cs" />
     <Compile Include="ViewModels\Browse\FavoritesViewModel.cs" />
-    <Compile Include="ViewModels\Controls\NavbarViewModel.cs" />
+    <Compile Include="ViewModels\Controls\ShellViewModel.cs" />
     <Compile Include="ViewModels\Settings\SettingsViewModel.cs" />
     <Compile Include="Views\Browse\Favorites.xaml.cs">
       <DependentUpon>Favorites.xaml</DependentUpon>
@@ -133,7 +135,7 @@
     <EmbeddedResource Include="Properties\TwitchPure.UI.rd.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Controls\Navbar.xaml">
+    <Page Include="Controls\Shell.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

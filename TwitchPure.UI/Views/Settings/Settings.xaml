@@ -12,8 +12,8 @@
 
 
   <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-    <controls:Navbar DataContext="{Binding NavbarViewModel}">
+    <controls:Shell>
       <TextBlock Text="Settings" Margin="12,12,0,0" Style="{StaticResource BaseTextBlockStyle}" />
-    </controls:Navbar>
+    </controls:Shell>
   </Grid>
 </Page>

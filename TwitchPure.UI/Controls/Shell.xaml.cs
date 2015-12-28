@@ -1,12 +1,13 @@
-﻿using Windows.UI.Xaml.Controls;
+﻿using TwitchPure.UI.ViewModels.Controls;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace TwitchPure.UI.Controls
 {
-  public sealed partial class Navbar : ContentControl
+  [Control(typeof(ShellViewModel))]
+  public sealed partial class Shell
   {
-    public Navbar()
+    public Shell()
     {
       this.InitializeComponent();
     }

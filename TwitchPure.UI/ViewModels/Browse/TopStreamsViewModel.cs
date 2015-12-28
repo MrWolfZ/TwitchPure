@@ -1,29 +1,15 @@
-﻿using System.Collections.Generic;
-using Prism.Windows.Navigation;
-using ReactiveUI;
+﻿using ReactiveUI;
 using TwitchPure.UI.ViewModels.Controls;
 
 namespace TwitchPure.UI.ViewModels.Browse
 {
-  public sealed class TopStreamsViewModel : ReactiveObject, INavigationAware
+  public sealed class TopStreamsViewModel : ReactiveObject
   {
-    private readonly INavigationService navigationService;
-
-    public TopStreamsViewModel(NavbarViewModel navbarViewModel, INavigationService navigationService)
+    public TopStreamsViewModel(ShellViewModel shellViewModel)
     {
-      this.NavbarViewModel = navbarViewModel;
-      this.navigationService = navigationService;
+      this.ShellViewModel = shellViewModel;
     }
 
-    public NavbarViewModel NavbarViewModel { get; }
-
-    public void OnNavigatedTo(NavigatedToEventArgs e, Dictionary<string, object> viewModelState)
-    {
-      this.navigationService.RemoveAllPages(ViewToken.Favorites);
-    }
-
-    public void OnNavigatingFrom(NavigatingFromEventArgs e, Dictionary<string, object> viewModelState, bool suspending)
-    {
-    }
+    public ShellViewModel ShellViewModel { get; }
   }
 }

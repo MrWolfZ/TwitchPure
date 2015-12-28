@@ -7,11 +7,14 @@ using Windows.ApplicationModel.Activation;
 using Windows.Globalization;
 using Windows.System.UserProfile;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Autofac;
 using Microsoft.ApplicationInsights;
 using Prism.Mvvm;
+using Prism.Windows.Navigation;
 using TwitchPure.Services;
 using TwitchPure.UI;
+using TwitchPure.UI.ViewModels.Controls;
 
 namespace TwitchPure
 {
@@ -42,12 +45,13 @@ namespace TwitchPure
       {
         // The app was launched from a Secondary Tile
         // Navigate to the item's page
+        // TODO: handle this
         this.NavigationService.Navigate(ViewToken.Favorites, args.Arguments);
       }
       else
       {
         // Navigate to the initial page
-        this.NavigationService.Navigate(ViewToken.Favorites, null);
+        this.NavigationService.Navigate(ViewToken.Favorites, new NavigationArgs { TargetViewToken = ViewToken.Favorites });
       }
 
       Window.Current.Activate();
@@ -57,6 +61,7 @@ namespace TwitchPure
     {
       // Set up the list of known types for the SuspensionManager
       this.SessionStateService.RegisterKnownType(typeof(Dictionary<string, Collection<string>>));
+      this.SessionStateService.RegisterKnownType(typeof(NavigationArgs));
     }
 
     protected override void ConfigureContainer(ContainerBuilder builder)
@@ -69,6 +74,15 @@ namespace TwitchPure
       base.ConfigureContainer(builder);
     }
 
+    protected override async Task<Frame> InitializeFrameAsync(IActivatedEventArgs args)
+    {
+      var frame = await base.InitializeFrameAsync(args);
+
+      this.RegisterInstance<IFrameFacade>(new FrameFacadeAdapter(frame), typeof(IFrameFacade), "", true);
+
+      return frame;
+    }
+
     protected override Type GetPageType(string pageToken)
     {
       Type t;
@@ -77,13 +91,19 @@ namespace TwitchPure
 
     protected override Task OnInitializeAsync(IActivatedEventArgs args)
     {
-      var registrations = this.Container.Resolve<IEnumerable<ViewRegistration>>().ToDictionary(r => r.ViewType, r => r);
-      foreach (var r in registrations.Values)
+      var viewRegistrations = this.Container.Resolve<IEnumerable<ViewRegistration>>().ToList();
+      foreach (var r in viewRegistrations)
       {
         this.ViewRegistrations.Add(r.Token, r.ViewType);
       }
 
-      ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver(viewType => registrations[viewType].ViewModelType);
+      var controlRegistrations = this.Container.Resolve<IEnumerable<ControlRegistration>>().ToList();
+
+      var viewModelRegistry = viewRegistrations.Select(r => new { Type = r.ViewType, r.ViewModelType })
+                                               .Concat(controlRegistrations.Select(r => new { Type = r.ControlType, r.ViewModelType }))
+                                               .ToDictionary(a => a.Type, a => a.ViewModelType);
+
+      ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver(viewType => viewModelRegistry[viewType]);
 
       // Documentation on working with tiles can be found at http://go.microsoft.com/fwlink/?LinkID=288821&clcid=0x409
       //var _tileUpdater = TileUpdateManager.CreateTileUpdaterForApplication();

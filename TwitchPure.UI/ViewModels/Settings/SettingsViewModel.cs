@@ -4,11 +4,11 @@ namespace TwitchPure.UI.ViewModels.Settings
 {
   public sealed class SettingsViewModel
   {
-    public SettingsViewModel(NavbarViewModel navbarViewModel)
+    public SettingsViewModel(ShellViewModel shellViewModel)
     {
-      this.NavbarViewModel = navbarViewModel;
+      this.ShellViewModel = shellViewModel;
     }
 
-    public NavbarViewModel NavbarViewModel { get; }
+    public ShellViewModel ShellViewModel { get; }
   }
 }
