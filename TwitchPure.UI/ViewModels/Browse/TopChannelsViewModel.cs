@@ -19,7 +19,7 @@ namespace TwitchPure.UI.ViewModels.Browse
         ViewToken.TopChannels,
         async (existingCount, requestedCount, token) =>
         {
-          var response = await twitchApi.GetTopStreamsAsync(requestedCount, existingCount);
+          var response = await twitchApi.GetTopStreamsAsync(Math.Max(10, requestedCount), existingCount);
           var hasMore = existingCount + response.Streams.Count < response.Total;
           var vms = response.Streams.Select(dto => new StreamThumbnailViewModel(dto)).ToList();
           return new InfiniteReactiveList<StreamThumbnailViewModel>.LoadItemsAsyncResult(vms, hasMore);

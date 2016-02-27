@@ -12,18 +12,66 @@
     <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
   </UserControl.Resources>
 
-  <StackPanel Height="130" Width="190" Margin="4 4 4 8">
-    <TextBlock Text="{Binding Source.Channel.DisplayName}"
-               Margin="8 4"
-               Width="186"
-               Style="{StaticResource BaseTextBlockStyle}"
-               HorizontalAlignment="Left" />
+  <StackPanel x:Name="Panel" Height="152" Width="270" Margin="10 8 10 8">
+    <VisualStateManager.VisualStateGroups>
+      <VisualStateGroup x:Name="WindowStates">
+        <VisualState x:Name="Narrow">
+          <VisualState.StateTriggers>
+            <AdaptiveTrigger MinWindowWidth="300" />
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="Panel.Width" Value="325" />
+            <Setter Target="Panel.Height" Value="215" />
+          </VisualState.Setters>
+        </VisualState>
+        <VisualState x:Name="Wide">
+          <VisualState.StateTriggers>
+            <AdaptiveTrigger MinWindowWidth="600" />
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="Panel.Width" Value="265" />
+            <Setter Target="Panel.Height" Value="175" />
+          </VisualState.Setters>
+        </VisualState>
+        <VisualState x:Name="ExtraWide">
+          <VisualState.StateTriggers>
+            <AdaptiveTrigger MinWindowWidth="800" />
+          </VisualState.StateTriggers>
+          <VisualState.Setters>
+            <Setter Target="Panel.Width" Value="325" />
+            <Setter Target="Panel.Height" Value="215" />
+          </VisualState.Setters>
+        </VisualState>
+      </VisualStateGroup>
+    </VisualStateManager.VisualStateGroups>
+
+    <Grid Margin="0 0 0 5">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      
+      <TextBlock Text="{Binding Source.Channel.DisplayName}"
+                 Style="{StaticResource BaseTextBlockStyle}"
+                 HorizontalAlignment="Left" />
+      <TextBlock Text="-"
+                 Grid.Column="1"
+                 Style="{StaticResource BaseTextBlockStyle}"
+                 HorizontalAlignment="Left"
+                 Margin="3 0" />
+      <TextBlock Text="{Binding Source.Game}"
+                 Grid.Column="2"
+                 Style="{StaticResource BaseTextBlockStyle}"
+                 HorizontalAlignment="Left"
+                 TextTrimming="CharacterEllipsis"
+                 TextWrapping="NoWrap" />
+    </Grid>
     <ProgressRing IsActive="True"
-                  Margin="8 0 8 8"
+                  Margin="0 8"
                   HorizontalAlignment="Left"
                   Visibility="{Binding ImageSource, Converter={StaticResource InverseNullToVisibilityConverter}}" />
-    <Image Margin="8 0 8 8"
-           Source="{Binding ImageSource}"
+    <Image Source="{Binding ImageSource}"
            Stretch="UniformToFill"
            Visibility="{Binding ImageSource, Converter={StaticResource NullToVisibilityConverter}}" />
   </StackPanel>

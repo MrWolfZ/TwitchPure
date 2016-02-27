@@ -10,12 +10,11 @@
              d:DataContext="{d:DesignInstance viewModels:StreamListViewModel}">
   <Grid>
     <Grid.Resources>
-      <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+      <converters:InverseIntegerToVisibilityConverter x:Key="InverseIntegerToVisibilityConverter" />
     </Grid.Resources>
 
     <Grid.RowDefinitions>
       <RowDefinition Height="*" />
-      <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
 
     <GridView Grid.Row="0"
@@ -30,14 +29,17 @@
           <controls:StreamThumbnail DataContext="{Binding}" />
         </DataTemplate>
       </GridView.ItemTemplate>
+      <GridView.ItemContainerTransitions>
+        <TransitionCollection />
+      </GridView.ItemContainerTransitions>
     </GridView>
 
-    <ProgressRing Grid.Row="1"
+    <ProgressRing Grid.Row="0"
                   IsActive="True"
                   Margin="8 0 8 8"
                   HorizontalAlignment="Center"
                   Height="50"
                   Width="50"
-                  Visibility="{Binding Streams.IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                  Visibility="{Binding Streams.Count, Converter={StaticResource InverseIntegerToVisibilityConverter}}" />
   </Grid>
 </UserControl>

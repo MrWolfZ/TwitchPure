@@ -97,6 +97,8 @@ namespace TwitchPure.UI.ViewModels.Watch
     public void OnNavigatingFrom(NavigatingFromEventArgs e, Dictionary<string, object> viewModelState, bool suspending)
     {
       DisplayInformation.AutoRotationPreferences = DisplayOrientations.None;
+      ApplicationView.GetForCurrentView().SetDesiredBoundsMode(ApplicationViewBoundsMode.UseVisible);
+      ApplicationView.GetForCurrentView().ExitFullScreenMode();
     }
 
     private async Task<StreamQualityInfoCollection> GetQualities()

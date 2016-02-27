@@ -82,6 +82,11 @@ namespace TwitchPure.UI.ViewModels.Controls
 
       this.disposable.Add(
         navigations
+          .Where(t => this.topNavLinks.ContainsKey(t) || this.bottomNavLinks.ContainsKey(t))
+          .Subscribe(t => navigationService.RemoveAllPages()));
+
+      this.disposable.Add(
+        navigations
           .Where(t => this.topNavLinks.ContainsKey(t))
           .Subscribe(t => this.TopSelectedLink = this.topNavLinks[t]));
 
