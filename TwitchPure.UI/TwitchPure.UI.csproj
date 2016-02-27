@@ -121,6 +121,7 @@
     </Compile>
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\IntegerToVisibilityConverter.cs" />
+    <Compile Include="Converters\InverseBooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\InverseIntegerToVisibilityConverter.cs" />
     <Compile Include="Converters\InverseNullToVisibilityConverter.cs" />
     <Compile Include="Converters\NegationConverter.cs" />

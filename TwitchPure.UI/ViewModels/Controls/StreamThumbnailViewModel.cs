@@ -10,7 +10,7 @@ using TwitchPure.Services.Dto.Twitch;
 
 namespace TwitchPure.UI.ViewModels.Controls
 {
-  public sealed class StreamThumbnailViewModel : ReactiveObject
+  public sealed class StreamThumbnailViewModel : ReactiveObject, IDisposable
   {
     private readonly ObservableAsPropertyHelper<ImageSource> imageSource;
 
@@ -43,5 +43,7 @@ namespace TwitchPure.UI.ViewModels.Controls
         return image;
       }
     }
+
+    public void Dispose() => this.imageSource.Dispose();
   }
 }

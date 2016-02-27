@@ -32,7 +32,7 @@ namespace TwitchPure.UI.ViewModels.Controls
     private readonly ObservableAsPropertyHelper<ListViewSelectionMode> topListSelectionMode;
     private readonly ObservableAsPropertyHelper<ListViewSelectionMode> bottomListSelectionMode;
     private readonly ObservableAsPropertyHelper<bool> isNavbarOpen;
-    private readonly CompositeDisposable disposable = new CompositeDisposable();
+    private readonly CompositeDisposable disposables = new CompositeDisposable();
     private NavLink topSelectedLink;
     private NavLink bottomSelectedLink;
     private object nestedDataContext;
@@ -56,9 +56,9 @@ namespace TwitchPure.UI.ViewModels.Controls
                            .Where(link => link != null)
                            .Select(link => link.ViewToken);
 
-      this.disposable.Add(
+      this.disposables.Add(
         selections
-          .Publish(pub => pub.StartWith((string)null).Zip<string, string, Tuple<string, string>>(pub, Tuple.Create))
+          .Publish(pub => pub.StartWith((string)null).Zip(pub, Tuple.Create))
           .Select(t => new NavigationArgs { SourceViewToken = t.Item1, TargetViewToken = t.Item2 })
           .Do(t => this.log.Trace($"Navigating from '{t.SourceViewToken}' to '{t.TargetViewToken}'"))
           .Subscribe(args => navigationService.Navigate(args.TargetViewToken, JsonConvert.SerializeObject(args))));
@@ -78,22 +78,26 @@ namespace TwitchPure.UI.ViewModels.Controls
                         let o = JsonConvert.DeserializeObject<NavigationArgs>(p)
                         select o.TargetViewToken;
 
-      this.disposable.Add(navigations.Subscribe(t => navigationService.RemoveAllPages(t)));
+      this.disposables.Add(navigations.Subscribe(t => navigationService.RemoveAllPages(t)));
 
-      this.disposable.Add(
+      this.disposables.Add(
         navigations
           .Where(t => this.topNavLinks.ContainsKey(t) || this.bottomNavLinks.ContainsKey(t))
           .Subscribe(t => navigationService.RemoveAllPages()));
 
-      this.disposable.Add(
+      this.disposables.Add(
         navigations
           .Where(t => this.topNavLinks.ContainsKey(t))
           .Subscribe(t => this.TopSelectedLink = this.topNavLinks[t]));
 
-      this.disposable.Add(
+      this.disposables.Add(
         navigations
           .Where(t => this.bottomNavLinks.ContainsKey(t))
           .Subscribe(t => this.BottomSelectedLink = this.bottomNavLinks[t]));
+
+      this.disposables.Add(this.topListSelectionMode);
+      this.disposables.Add(this.bottomListSelectionMode);
+      this.disposables.Add(this.isNavbarOpen);
     }
 
     public object NestedDataContext
@@ -122,7 +126,7 @@ namespace TwitchPure.UI.ViewModels.Controls
       set { this.RaiseAndSetIfChanged(ref this.bottomSelectedLink, value); }
     }
 
-    public void Dispose() => this.disposable.Dispose();
+    public void Dispose() => this.disposables.Dispose();
   }
 
   [DataContract]

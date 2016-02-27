@@ -24,17 +24,16 @@ namespace TwitchPure.UI.ViewModels.Watch
 {
   public sealed class LiveViewModel : ReactiveObject, INavigationAware, IDisposable
   {
-    private readonly CompositeDisposable disposables = new CompositeDisposable();
     private readonly ILogger log;
 
+    private readonly CompositeDisposable disposables = new CompositeDisposable();
     private readonly ObservableAsPropertyHelper<Uri> mediaUri;
     private readonly ObservableAsPropertyHelper<double> volume;
     private readonly ObservableAsPropertyHelper<StreamQualityInfoCollection> qualities;
     private readonly ObservableAsPropertyHelper<bool> isCommandBarVisibile;
+    private readonly ObservableAsPropertyHelper<bool> isMuted;
     private readonly TaskCompletionSource<StreamQualityInfoCollection> qualityLoad = new TaskCompletionSource<StreamQualityInfoCollection>();
     private readonly DeviceWatcher deviceWatcher;
-
-    private bool isMuted;
 
     public LiveViewModel(ILogger log, IApplicationLifecycle appLifecycle)
     {
@@ -63,6 +62,7 @@ namespace TwitchPure.UI.ViewModels.Watch
                                      .Select(info => info.Type);
 
       this.Tapped = ReactiveCommand.Create(Observable.Return(true));
+      this.ToggleMute = ReactiveCommand.Create(Observable.Return(true));
       this.QualityMenuOpened = ReactiveCommand.Create(Observable.Return(true));
 
       this.isCommandBarVisibile = this.Tapped
@@ -84,21 +84,31 @@ namespace TwitchPure.UI.ViewModels.Watch
       this.deviceWatcher = DeviceInformation.CreateWatcher(DeviceClass.AudioRender);
 
       // TODO: abstract into service
-      this.disposables.Add(
-        Observable.FromEventPattern<TypedEventHandler<DeviceWatcher, DeviceInformationUpdate>, DeviceInformationUpdate>(
-          h => this.deviceWatcher.Removed += h,
-          h => this.deviceWatcher.Removed -= h
-          )
-                  .Select(a => true)
-                  .ObserveOn(RxApp.MainThreadScheduler)
-                  .Subscribe(b => this.IsMuted = b));
+      var muteOnHeadphonesRemoved = Observable.FromEventPattern<TypedEventHandler<DeviceWatcher, DeviceInformationUpdate>, DeviceInformationUpdate>(
+        h => this.deviceWatcher.Removed += h,
+        h => this.deviceWatcher.Removed -= h
+        ).Select(a => true).Publish();
+
+      this.disposables.Add(muteOnHeadphonesRemoved.Connect());
+
+      this.isMuted = this.ToggleMute
+                         .Select(o => !this.IsMuted)
+                         .Merge(muteOnHeadphonesRemoved)
+                         .ToProperty(this, vm => vm.IsMuted, scheduler: RxApp.MainThreadScheduler);
 
       this.volume = this.WhenAnyValue(vm => vm.IsMuted)
                         .Select(b => b ? 0.0 : 1.0)
                         .ToProperty(this, vm => vm.Volume, scheduler: RxApp.MainThreadScheduler, initialValue: 1.0);
+
+      this.disposables.Add(this.mediaUri);
+      this.disposables.Add(this.volume);
+      this.disposables.Add(this.qualities);
+      this.disposables.Add(this.isCommandBarVisibile);
+      this.disposables.Add(this.isMuted);
     }
 
     public ReactiveCommand<object> Tapped { get; }
+    public ReactiveCommand<object> ToggleMute { get; }
     public ReactiveCommand<object> QualityMenuOpened { get; }
     public IObservable<QualityType> SelectedQualityType { get; }
     public StreamQualityInfoCollection Qualities => this.qualities.Value;
@@ -106,12 +116,7 @@ namespace TwitchPure.UI.ViewModels.Watch
     public Uri MediaUri => this.mediaUri.Value;
     public bool IsCommandBarVisibile => this.isCommandBarVisibile.Value;
     public double Volume => this.volume.Value;
-
-    public bool IsMuted
-    {
-      get { return this.isMuted; }
-      set { this.RaiseAndSetIfChanged(ref this.isMuted, value); }
-    }
+    public bool IsMuted => this.isMuted.Value;
 
     public void Dispose() => this.disposables.Dispose();
 
@@ -147,6 +152,7 @@ namespace TwitchPure.UI.ViewModels.Watch
       ApplicationView.GetForCurrentView().ExitFullScreenMode();
 
       this.deviceWatcher.Stop();
+      this.Dispose();
     }
 
     private static async Task<StreamQualityInfoCollection> GetQualities(string channel)

@@ -31,6 +31,16 @@ namespace TwitchPure.UI.ViewModels.Browse
 
     public StreamListViewModel StreamListViewModel { get; }
 
+    public void Dispose()
+    {
+      foreach (var viewModel in this.StreamListViewModel.Streams)
+      {
+        viewModel.Dispose();
+      }
+
+      this.StreamListViewModel.Dispose();
+    }
+
     public void OnNavigatedTo(NavigatedToEventArgs e, Dictionary<string, object> viewModelState)
     {
     }
@@ -42,7 +52,7 @@ namespace TwitchPure.UI.ViewModels.Browse
         return;
       }
 
-      this.StreamListViewModel.Dispose();
+      this.Dispose();
     }
   }
 }

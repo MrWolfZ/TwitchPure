@@ -21,6 +21,7 @@
       </ResourceDictionary.MergedDictionaries>
 
       <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+      <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
       <converters:NullToBooleanConverter x:Key="NullToBooleanConverter" />
       <Style x:Key="CommandBarStyle" BasedOn="{StaticResource CustomCommandBarStyle}" TargetType="CommandBar">
         <Setter Property="Background">
@@ -107,6 +108,10 @@
           </core:DataTriggerBehavior>
         </interactivity:Interaction.Behaviors>
 
+        <AppBarButton Icon="Mute" IsCompact="True" Command="{Binding ToggleMute}" 
+                      Visibility="{Binding IsMuted, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <AppBarButton Icon="Volume" IsCompact="True" Command="{Binding ToggleMute}"
+                      Visibility="{Binding IsMuted, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
         <AppBarButton Icon="Video" IsCompact="True" IsEnabled="{Binding Qualities, Converter={StaticResource NullToBooleanConverter}}"
                       Command="{Binding QualityMenuOpened}">
           <AppBarButton.Flyout>
