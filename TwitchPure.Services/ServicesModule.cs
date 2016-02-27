@@ -8,7 +8,10 @@ namespace TwitchPure.Services
     protected override void Load(ContainerBuilder builder)
     {
       builder.RegisterType<TwitchApi>()
-             .As<ITwitchApi>();
+             .AsImplementedInterfaces();
+
+      builder.RegisterType<ApplicationLifecycle>()
+             .AsImplementedInterfaces();
 
       base.Load(builder);
     }

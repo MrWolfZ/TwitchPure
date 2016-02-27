@@ -107,6 +107,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplicationLifecycle.cs" />
     <Compile Include="Data\Twitch\ITwitchApi.cs" />
     <Compile Include="Dto\Twitch\Stream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

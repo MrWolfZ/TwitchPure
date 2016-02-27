@@ -43,14 +43,14 @@ namespace TwitchPure
 
       ApplicationLanguages.PrimaryLanguageOverride = GlobalizationPreferences.Languages[0];
 
-      if (!string.IsNullOrEmpty(args?.Arguments))
+      if (!string.IsNullOrEmpty(args.Arguments))
       {
         // The app was launched from a Secondary Tile
         // Navigate to the item's page
         // TODO: handle this
         this.NavigationService.Navigate(ViewToken.Favorites, args.Arguments);
       }
-      else
+      else if (args.PreviousExecutionState == ApplicationExecutionState.NotRunning)
       {
         // Navigate to the initial page
         const string InitialPage = ViewToken.TopChannels;
@@ -109,7 +109,7 @@ namespace TwitchPure
       // Documentation on working with tiles can be found at http://go.microsoft.com/fwlink/?LinkID=288821&clcid=0x409
       //var _tileUpdater = TileUpdateManager.CreateTileUpdaterForApplication();
       //_tileUpdater.StartPeriodicUpdate(new Uri(Constants.ServerAddress + "/api/TileNotification"), PeriodicUpdateRecurrence.HalfHour);
-
+      
       return base.OnInitializeAsync(args);
     }
 

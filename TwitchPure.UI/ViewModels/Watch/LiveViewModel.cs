@@ -17,6 +17,7 @@ using MetroLog;
 using Newtonsoft.Json;
 using Prism.Windows.Navigation;
 using ReactiveUI;
+using TwitchPure.Services;
 using TwitchPure.UI.ViewModels.Controls;
 
 namespace TwitchPure.UI.ViewModels.Watch
@@ -30,24 +31,29 @@ namespace TwitchPure.UI.ViewModels.Watch
     private readonly ObservableAsPropertyHelper<double> volume;
     private readonly ObservableAsPropertyHelper<StreamQualityInfoCollection> qualities;
     private readonly ObservableAsPropertyHelper<bool> isCommandBarVisibile;
-    private readonly TaskCompletionSource<string> channelName = new TaskCompletionSource<string>();
+    private readonly TaskCompletionSource<StreamQualityInfoCollection> qualityLoad = new TaskCompletionSource<StreamQualityInfoCollection>();
     private readonly DeviceWatcher deviceWatcher;
 
     private bool isMuted;
 
-    public LiveViewModel(ILogger log)
+    public LiveViewModel(ILogger log, IApplicationLifecycle appLifecycle)
     {
       this.log = log;
 
-      this.qualities = Observable.FromAsync(this.GetQualities)
+      this.qualities = Observable.FromAsync(() => this.qualityLoad.Task)
                                  .Catch((Exception ex) => Observable.Never<StreamQualityInfoCollection>())
                                  .ToProperty(this, vm => vm.Qualities, scheduler: RxApp.MainThreadScheduler);
+
+      var suspendsAndResumes = appLifecycle.Suspends.Select(u => false)
+                                           .Merge(appLifecycle.Resumes.Select(u => true))
+                                           .StartWith(true);
 
       this.mediaUri = this.WhenAnyValue(vm => vm.Qualities)
                           .Where(col => col != null)
                           .Select(col => col.SelectedQuality)
                           .Switch()
                           .Select(info => new Uri(info.Url))
+                          .CombineLatest(suspendsAndResumes, (uri, b) => b ? uri : null)
                           .ToProperty(this, x => x.MediaUri, scheduler: RxApp.MainThreadScheduler);
 
       this.SelectedQualityType = this.WhenAnyValue(vm => vm.Qualities)
@@ -83,9 +89,9 @@ namespace TwitchPure.UI.ViewModels.Watch
           h => this.deviceWatcher.Removed += h,
           h => this.deviceWatcher.Removed -= h
           )
-          .Select(a => true)
-          .ObserveOn(RxApp.MainThreadScheduler)
-          .Subscribe(b => this.IsMuted = b));
+                  .Select(a => true)
+                  .ObserveOn(RxApp.MainThreadScheduler)
+                  .Subscribe(b => this.IsMuted = b));
 
       this.volume = this.WhenAnyValue(vm => vm.IsMuted)
                         .Select(b => b ? 0.0 : 1.0)
@@ -126,11 +132,16 @@ namespace TwitchPure.UI.ViewModels.Watch
       var args = JsonConvert.DeserializeObject<LiveNavigationArgs>((string)e.Parameter);
       this.log.Trace(args.ChannelName);
 
-      this.channelName.SetResult(args.ChannelName);
+      Observable.FromAsync(() => GetQualities(args.ChannelName)).Subscribe(this.qualityLoad.SetResult);
     }
 
     public void OnNavigatingFrom(NavigatingFromEventArgs e, Dictionary<string, object> viewModelState, bool suspending)
     {
+      if (suspending)
+      {
+        return;
+      }
+
       DisplayInformation.AutoRotationPreferences = DisplayOrientations.None;
       ApplicationView.GetForCurrentView().SetDesiredBoundsMode(ApplicationViewBoundsMode.UseVisible);
       ApplicationView.GetForCurrentView().ExitFullScreenMode();
@@ -138,9 +149,9 @@ namespace TwitchPure.UI.ViewModels.Watch
       this.deviceWatcher.Stop();
     }
 
-    private async Task<StreamQualityInfoCollection> GetQualities()
+    private static async Task<StreamQualityInfoCollection> GetQualities(string channel)
     {
-      var channel = (await this.channelName.Task).ToLowerInvariant();
+      channel = channel.ToLowerInvariant();
 
       var regex = new Regex("#EXT-X-MEDIA:.*NAME=\"(.*)\".*\\n.*\\n(.*)");
 
