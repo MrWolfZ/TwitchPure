@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Windows.Devices.Enumeration;
+using Windows.Foundation;
 using Windows.Graphics.Display;
 using Windows.System.Profile;
 using Windows.UI.ViewManagement;
@@ -18,14 +21,19 @@ using TwitchPure.UI.ViewModels.Controls;
 
 namespace TwitchPure.UI.ViewModels.Watch
 {
-  public sealed class LiveViewModel : ReactiveObject, INavigationAware
+  public sealed class LiveViewModel : ReactiveObject, INavigationAware, IDisposable
   {
+    private readonly CompositeDisposable disposables = new CompositeDisposable();
     private readonly ILogger log;
 
     private readonly ObservableAsPropertyHelper<Uri> mediaUri;
+    private readonly ObservableAsPropertyHelper<double> volume;
     private readonly ObservableAsPropertyHelper<StreamQualityInfoCollection> qualities;
     private readonly ObservableAsPropertyHelper<bool> isCommandBarVisibile;
     private readonly TaskCompletionSource<string> channelName = new TaskCompletionSource<string>();
+    private readonly DeviceWatcher deviceWatcher;
+
+    private bool isMuted;
 
     public LiveViewModel(ILogger log)
     {
@@ -66,6 +74,22 @@ namespace TwitchPure.UI.ViewModels.Watch
                                                              .Amb(Observable.Timer(TimeSpan.FromSeconds(3)).Select(_ => false))
                                                              .Amb(this.QualityMenuOpened.FirstAsync().Select(_ => true)))))
                                       .ToProperty(this, vm => vm.IsCommandBarVisibile, scheduler: RxApp.MainThreadScheduler);
+
+      this.deviceWatcher = DeviceInformation.CreateWatcher(DeviceClass.AudioRender);
+
+      // TODO: abstract into service
+      this.disposables.Add(
+        Observable.FromEventPattern<TypedEventHandler<DeviceWatcher, DeviceInformationUpdate>, DeviceInformationUpdate>(
+          h => this.deviceWatcher.Removed += h,
+          h => this.deviceWatcher.Removed -= h
+          )
+          .Select(a => true)
+          .ObserveOn(RxApp.MainThreadScheduler)
+          .Subscribe(b => this.IsMuted = b));
+
+      this.volume = this.WhenAnyValue(vm => vm.IsMuted)
+                        .Select(b => b ? 0.0 : 1.0)
+                        .ToProperty(this, vm => vm.Volume, scheduler: RxApp.MainThreadScheduler, initialValue: 1.0);
     }
 
     public ReactiveCommand<object> Tapped { get; }
@@ -75,6 +99,15 @@ namespace TwitchPure.UI.ViewModels.Watch
 
     public Uri MediaUri => this.mediaUri.Value;
     public bool IsCommandBarVisibile => this.isCommandBarVisibile.Value;
+    public double Volume => this.volume.Value;
+
+    public bool IsMuted
+    {
+      get { return this.isMuted; }
+      set { this.RaiseAndSetIfChanged(ref this.isMuted, value); }
+    }
+
+    public void Dispose() => this.disposables.Dispose();
 
     public void OnNavigatedTo(NavigatedToEventArgs e, Dictionary<string, object> viewModelState)
     {
@@ -82,6 +115,8 @@ namespace TwitchPure.UI.ViewModels.Watch
       DisplayInformation.AutoRotationPreferences = DisplayOrientations.Landscape | DisplayOrientations.LandscapeFlipped;
       ApplicationView.GetForCurrentView().SetDesiredBoundsMode(ApplicationViewBoundsMode.UseCoreWindow);
       ApplicationView.GetForCurrentView().FullScreenSystemOverlayMode = FullScreenSystemOverlayMode.Standard;
+
+      this.deviceWatcher.Start();
 
       if (AnalyticsInfo.VersionInfo.DeviceFamily.Contains("Mobile"))
       {
@@ -99,6 +134,8 @@ namespace TwitchPure.UI.ViewModels.Watch
       DisplayInformation.AutoRotationPreferences = DisplayOrientations.None;
       ApplicationView.GetForCurrentView().SetDesiredBoundsMode(ApplicationViewBoundsMode.UseVisible);
       ApplicationView.GetForCurrentView().ExitFullScreenMode();
+
+      this.deviceWatcher.Stop();
     }
 
     private async Task<StreamQualityInfoCollection> GetQualities()

@@ -12,7 +12,9 @@
       mvvm:ViewModelLocator.AutoWireViewModel="True">
   <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
     <playerFramework:MediaPlayer Source="{Binding MediaUri}"
-                                 InteractiveActivationMode="None">
+                                 InteractiveActivationMode="None"
+                                 IsPauseEnabled="False"
+                                 Volume="{Binding Volume}">
       <playerFramework:MediaPlayer.Plugins>
         <adaptive:AdaptivePlugin />
       </playerFramework:MediaPlayer.Plugins>
