@@ -7,10 +7,19 @@
       xmlns:watch="using:TwitchPure.UI.ViewModels.Watch"
       xmlns:playerFramework="using:Microsoft.PlayerFramework"
       xmlns:adaptive="using:Microsoft.PlayerFramework.Adaptive"
+      xmlns:converters="using:TwitchPure.UI.Converters"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance watch:LiveViewModel}"
       mvvm:ViewModelLocator.AutoWireViewModel="True">
   <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid.Resources>
+      <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
+    </Grid.Resources>
+
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+    
     <playerFramework:MediaPlayer Source="{Binding MediaUri}"
                                  InteractiveActivationMode="None"
                                  IsPauseEnabled="False"
@@ -19,5 +28,13 @@
         <adaptive:AdaptivePlugin />
       </playerFramework:MediaPlayer.Plugins>
     </playerFramework:MediaPlayer>
+
+    <ProgressRing Grid.Row="0"
+                  IsActive="True"
+                  Margin="8 0 8 8"
+                  HorizontalAlignment="Center"
+                  Height="50"
+                  Width="50"
+                  Visibility="{Binding Qualities, Converter={StaticResource InverseNullToVisibilityConverter}}" />
   </Grid>
 </Page>
