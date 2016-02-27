@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Prism.Windows.Navigation;
 using ReactiveUI;
 using TwitchPure.Services.Data.Twitch;
 using TwitchPure.UI.ViewModels.Controls;
 
 namespace TwitchPure.UI.ViewModels.Browse
 {
-  public sealed class TopChannelsViewModel : ReactiveObject
+  public sealed class TopChannelsViewModel : ReactiveObject, INavigationAware
   {
     public TopChannelsViewModel(
       ShellViewModel shellViewModel,
@@ -28,5 +30,19 @@ namespace TwitchPure.UI.ViewModels.Browse
     }
 
     public StreamListViewModel StreamListViewModel { get; }
+
+    public void OnNavigatedTo(NavigatedToEventArgs e, Dictionary<string, object> viewModelState)
+    {
+    }
+
+    public void OnNavigatingFrom(NavigatingFromEventArgs e, Dictionary<string, object> viewModelState, bool suspending)
+    {
+      if (suspending)
+      {
+        return;
+      }
+
+      this.StreamListViewModel.Dispose();
+    }
   }
 }
