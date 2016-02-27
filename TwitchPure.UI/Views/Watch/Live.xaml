@@ -89,7 +89,7 @@
                   <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CommandBar" Storyboard.TargetProperty="Visibility">
                     <DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
                   </ObjectAnimationUsingKeyFrames>
-                  <DoubleAnimation Duration="0:0:1" Storyboard.TargetName="CommandBar" Storyboard.TargetProperty="Opacity" To="1.0" />
+                  <DoubleAnimation Duration="0:0:0.2" Storyboard.TargetName="CommandBar" Storyboard.TargetProperty="Opacity" To="1.0" />
                 </Storyboard>
               </media:ControlStoryboardAction.Storyboard>
             </media:ControlStoryboardAction>
@@ -98,8 +98,8 @@
             <media:ControlStoryboardAction>
               <media:ControlStoryboardAction.Storyboard>
                 <Storyboard>
-                  <DoubleAnimation Duration="0:0:1" Storyboard.TargetName="CommandBar" Storyboard.TargetProperty="Opacity" To="0.0" />
-                  <ObjectAnimationUsingKeyFrames BeginTime="0:0:1" Storyboard.TargetName="CommandBar" Storyboard.TargetProperty="Visibility">
+                  <DoubleAnimation Duration="0:0:0.2" Storyboard.TargetName="CommandBar" Storyboard.TargetProperty="Opacity" To="0.0" />
+                  <ObjectAnimationUsingKeyFrames BeginTime="0:0:0.2" Storyboard.TargetName="CommandBar" Storyboard.TargetProperty="Visibility">
                     <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed" />
                   </ObjectAnimationUsingKeyFrames>
                 </Storyboard>
