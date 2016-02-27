@@ -124,6 +124,7 @@
     <Compile Include="Converters\InverseIntegerToVisibilityConverter.cs" />
     <Compile Include="Converters\InverseNullToVisibilityConverter.cs" />
     <Compile Include="Converters\NegationConverter.cs" />
+    <Compile Include="Converters\NullToBooleanConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="InfiniteReactiveList.cs" />
     <Compile Include="ViewAttribute.cs" />
@@ -169,6 +170,11 @@
     <Page Include="Controls\StreamThumbnail.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
     <Page Include="Views\Browse\Favorites.xaml">
       <SubType>Designer</SubType>

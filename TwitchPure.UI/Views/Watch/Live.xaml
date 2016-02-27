@@ -8,33 +8,144 @@
       xmlns:playerFramework="using:Microsoft.PlayerFramework"
       xmlns:adaptive="using:Microsoft.PlayerFramework.Adaptive"
       xmlns:converters="using:TwitchPure.UI.Converters"
+      xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+      xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+      xmlns:media="using:Microsoft.Xaml.Interactions.Media"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance watch:LiveViewModel}"
       mvvm:ViewModelLocator.AutoWireViewModel="True">
+  <Page.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="../../Themes/Generic.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+
+      <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+      <converters:NullToBooleanConverter x:Key="NullToBooleanConverter" />
+      <Style x:Key="CommandBarStyle" BasedOn="{StaticResource CustomCommandBarStyle}" TargetType="CommandBar">
+        <Setter Property="Background">
+          <Setter.Value>
+            <SolidColorBrush Color="{StaticResource SystemAltHighColor}" Opacity="0.5" />
+          </Setter.Value>
+        </Setter>
+      </Style>
+      <Style x:Key="FlyoutMenuStyle" BasedOn="{StaticResource CustomMenuFlyoutPresenterStyle}" TargetType="MenuFlyoutPresenter">
+        <Setter Property="MaxWidth" Value="150" />
+        <Setter Property="Background">
+          <Setter.Value>
+            <SolidColorBrush Color="{StaticResource SystemAltHighColor}" Opacity="0.5" />
+          </Setter.Value>
+        </Setter>
+      </Style>
+    </ResourceDictionary>
+  </Page.Resources>
+
   <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-    <Grid.Resources>
-      <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
-    </Grid.Resources>
+    <Grid IsDoubleTapEnabled="False">
+      <Grid.Resources>
+        <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
+      </Grid.Resources>
 
-    <Grid.RowDefinitions>
-      <RowDefinition Height="*" />
-    </Grid.RowDefinitions>
-    
-    <playerFramework:MediaPlayer Source="{Binding MediaUri}"
-                                 InteractiveActivationMode="None"
-                                 IsPauseEnabled="False"
-                                 Volume="{Binding Volume}">
-      <playerFramework:MediaPlayer.Plugins>
-        <adaptive:AdaptivePlugin />
-      </playerFramework:MediaPlayer.Plugins>
-    </playerFramework:MediaPlayer>
+      <Grid.Background>
+        <SolidColorBrush Color="{StaticResource SystemAltHighColor}" />
+      </Grid.Background>
 
-    <ProgressRing Grid.Row="0"
-                  IsActive="True"
-                  Margin="8 0 8 8"
-                  HorizontalAlignment="Center"
-                  Height="50"
-                  Width="50"
-                  Visibility="{Binding Qualities, Converter={StaticResource InverseNullToVisibilityConverter}}" />
+      <Grid.RowDefinitions>
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+      
+      <interactivity:Interaction.Behaviors>
+        <core:EventTriggerBehavior EventName="Tapped">
+          <core:InvokeCommandAction Command="{Binding Tapped}" />
+        </core:EventTriggerBehavior>
+      </interactivity:Interaction.Behaviors>
+
+      <playerFramework:MediaPlayer Source="{Binding MediaUri}"
+                                   InteractiveActivationMode="None"
+                                   IsPauseEnabled="False"
+                                   Volume="{Binding Volume}">
+        <playerFramework:MediaPlayer.Plugins>
+          <adaptive:AdaptivePlugin />
+        </playerFramework:MediaPlayer.Plugins>
+      </playerFramework:MediaPlayer>
+
+      <ProgressRing Grid.Row="0"
+                    IsActive="True"
+                    Margin="8 0 8 8"
+                    HorizontalAlignment="Center"
+                    Height="50"
+                    Width="50"
+                    Visibility="{Binding Qualities, Converter={StaticResource InverseNullToVisibilityConverter}}" />
+    </Grid>
+
+    <StackPanel x:Name="CommandBar" Visibility="Collapsed">
+      <CommandBar Style="{StaticResource CommandBarStyle}">
+        <interactivity:Interaction.Behaviors>
+          <core:DataTriggerBehavior Binding="{Binding IsCommandBarVisibile}" Value="True">
+            <media:ControlStoryboardAction>
+              <media:ControlStoryboardAction.Storyboard>
+                <Storyboard>
+                  <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CommandBar" Storyboard.TargetProperty="Visibility">
+                    <DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
+                  </ObjectAnimationUsingKeyFrames>
+                  <DoubleAnimation Duration="0:0:1" Storyboard.TargetName="CommandBar" Storyboard.TargetProperty="Opacity" To="1.0" />
+                </Storyboard>
+              </media:ControlStoryboardAction.Storyboard>
+            </media:ControlStoryboardAction>
+          </core:DataTriggerBehavior>
+          <core:DataTriggerBehavior Binding="{Binding IsCommandBarVisibile}" Value="False">
+            <media:ControlStoryboardAction>
+              <media:ControlStoryboardAction.Storyboard>
+                <Storyboard>
+                  <DoubleAnimation Duration="0:0:1" Storyboard.TargetName="CommandBar" Storyboard.TargetProperty="Opacity" To="0.0" />
+                  <ObjectAnimationUsingKeyFrames BeginTime="0:0:1" Storyboard.TargetName="CommandBar" Storyboard.TargetProperty="Visibility">
+                    <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed" />
+                  </ObjectAnimationUsingKeyFrames>
+                </Storyboard>
+              </media:ControlStoryboardAction.Storyboard>
+            </media:ControlStoryboardAction>
+          </core:DataTriggerBehavior>
+        </interactivity:Interaction.Behaviors>
+
+        <AppBarButton Icon="Video" IsCompact="True" IsEnabled="{Binding Qualities, Converter={StaticResource NullToBooleanConverter}}"
+                      Command="{Binding QualityMenuOpened}">
+          <AppBarButton.Flyout>
+            <MenuFlyout MenuFlyoutPresenterStyle="{StaticResource FlyoutMenuStyle}" Placement="Bottom">
+              <ToggleMenuFlyoutItem x:Name="SourceQualityMenuItem"
+                                    Visibility="{Binding Qualities.IsSourceVisible, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
+                                    Text="Source"
+                                    Command="{Binding Qualities.SetSelectedQuality}"
+                                    CommandParameter="{Binding Qualities.Source}" />
+              <ToggleMenuFlyoutItem x:Name="HighQualityMenuItem"
+                                    Visibility="{Binding Qualities.IsHighVisible, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
+                                    Text="High"
+                                    Command="{Binding Qualities.SetSelectedQuality}"
+                                    CommandParameter="{Binding Qualities.High}" />
+              <ToggleMenuFlyoutItem x:Name="MediumQualityMenuItem"
+                                    Visibility="{Binding Qualities.IsMediumVisible, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
+                                    Text="Medium"
+                                    Command="{Binding Qualities.SetSelectedQuality}"
+                                    CommandParameter="{Binding Qualities.Medium}" />
+              <ToggleMenuFlyoutItem x:Name="LowQualityMenuItem"
+                                    Visibility="{Binding Qualities.IsLowVisible, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
+                                    Text="Low"
+                                    Command="{Binding Qualities.SetSelectedQuality}"
+                                    CommandParameter="{Binding Qualities.Low}" />
+              <ToggleMenuFlyoutItem x:Name="MobileQualityMenuItem"
+                                    Visibility="{Binding Qualities.IsMobileVisible, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
+                                    Text="Mobile"
+                                    Command="{Binding Qualities.SetSelectedQuality}"
+                                    CommandParameter="{Binding Qualities.Mobile}" />
+              <ToggleMenuFlyoutItem x:Name="AudioOnlyQualityMenuItem"
+                                    Visibility="{Binding Qualities.IsAudioOnlyVisible, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
+                                    Text="Audio Only"
+                                    Command="{Binding Qualities.SetSelectedQuality}"
+                                    CommandParameter="{Binding Qualities.AudioOnly}" />
+            </MenuFlyout>
+          </AppBarButton.Flyout>
+        </AppBarButton>
+        <AppBarButton Icon="Setting" IsCompact="True" />
+      </CommandBar>
+    </StackPanel>
   </Grid>
 </Page>
