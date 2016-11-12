@@ -14,6 +14,7 @@ namespace TwitchPure.UI
 
     private readonly LoadItemsAsync loadAsync;
     private bool isLoading;
+    private bool hasMoreItems = true;
 
     public InfiniteReactiveList(LoadItemsAsync loadAsync)
     {
@@ -26,7 +27,11 @@ namespace TwitchPure.UI
       set { this.RaiseAndSetIfChanged(ref this.isLoading, value); }
     }
 
-    public bool HasMoreItems { get; private set; } = true;
+    public bool HasMoreItems
+    {
+      get { return this.hasMoreItems; }
+      private set { this.RaiseAndSetIfChanged(ref this.hasMoreItems, value); }
+    }
 
     public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count) => AsyncInfo.Run(c => this.ExecuteLoadItemsAsync(count, c));
 

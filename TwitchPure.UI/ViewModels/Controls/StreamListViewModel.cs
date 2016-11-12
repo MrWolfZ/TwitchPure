@@ -12,6 +12,7 @@ namespace TwitchPure.UI.ViewModels.Controls
   public sealed class StreamListViewModel : ReactiveObject, IDisposable
   {
     private readonly CompositeDisposable disposables = new CompositeDisposable();
+    private readonly ObservableAsPropertyHelper<bool> isSpinnerVisible;
     private StreamThumbnailViewModel selectedItem;
 
     public StreamListViewModel(
@@ -32,9 +33,17 @@ namespace TwitchPure.UI.ViewModels.Controls
             navigationService.Navigate(
               ViewToken.Live,
               JsonConvert.SerializeObject(new LiveNavigationArgs { TargetViewToken = ViewToken.Live, SourceViewToken = viewToken, ChannelName = name })));
+
+      this.isSpinnerVisible = this.Streams.WhenAnyValue(s => s.Count, s => s.HasMoreItems)
+                                  .Select(t => t.Item1 == 0 && t.Item2)
+                                  .ToProperty(this, vm => vm.IsSpinnerVisible, true, RxApp.MainThreadScheduler);
+
+      this.disposables.Add(this.isSpinnerVisible);
     }
 
     public InfiniteReactiveList<StreamThumbnailViewModel> Streams { get; }
+
+    public bool IsSpinnerVisible => this.isSpinnerVisible.Value;
 
     public StreamThumbnailViewModel SelectedItem
     {

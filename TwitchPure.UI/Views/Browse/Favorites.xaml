@@ -3,17 +3,26 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:prismMvvm="using:Prism.Windows.Mvvm"
+      xmlns:viewModels="using:TwitchPure.UI.ViewModels.Browse"
       xmlns:controls="using:TwitchPure.UI.Controls"
-      xmlns:browse="using:TwitchPure.UI.ViewModels.Browse"
-      xmlns:mvvm="using:Prism.Windows.Mvvm"
       mc:Ignorable="d"
-      d:DataContext="{d:DesignInstance browse:FavoritesViewModel}"
-      mvvm:ViewModelLocator.AutoWireViewModel="True">
-
+      d:DataContext="{d:DesignInstance viewModels:FavoritesViewModel}"
+      prismMvvm:ViewModelLocator.AutoWireViewModel="True">
 
   <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-    <controls:Shell DataContext="{Binding ShellViewModel}">
-      <TextBlock Text="Favorites" Margin="12,12,0,0" Style="{StaticResource BaseTextBlockStyle}" />
+    <controls:Shell>
+      <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
+      <Grid DataContext="{Binding NestedDataContext}">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Uid="Favorites_Header" Margin="12,12,0,0" Style="{StaticResource BaseTextBlockStyle}" />
+
+        <controls:StreamList Grid.Row="1" DataContext="{Binding StreamListViewModel}" />
+      </Grid>
     </controls:Shell>
   </Grid>
 </Page>

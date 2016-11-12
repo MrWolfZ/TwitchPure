@@ -135,4 +135,7 @@
   <data name="TopGames_Header.Text" xml:space="preserve">
     <value>Top Games</value>
   </data>
+  <data name="Favorites_Header.Text" xml:space="preserve">
+    <value>Favorites</value>
+  </data>
 </root>

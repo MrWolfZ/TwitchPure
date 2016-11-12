@@ -4,15 +4,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="using:TwitchPure.UI.ViewModels.Controls"
-             xmlns:converters="using:TwitchPure.UI.Converters"
              xmlns:controls="using:TwitchPure.UI.Controls"
+             xmlns:converters="using:TwitchPure.UI.Converters"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:StreamListViewModel}">
   <Grid>
     <Grid.Resources>
-      <converters:InverseIntegerToVisibilityConverter x:Key="InverseIntegerToVisibilityConverter" />
+      <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Grid.Resources>
-
+    
     <Grid.RowDefinitions>
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
@@ -40,6 +40,6 @@
                   HorizontalAlignment="Center"
                   Height="50"
                   Width="50"
-                  Visibility="{Binding Streams.Count, Converter={StaticResource InverseIntegerToVisibilityConverter}}" />
+                  Visibility="{Binding IsSpinnerVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
   </Grid>
 </UserControl>

@@ -13,6 +13,9 @@ namespace TwitchPure.Services
       builder.RegisterType<ApplicationLifecycle>()
              .AsImplementedInterfaces();
 
+      builder.RegisterType<FavoritesService>()
+             .AsImplementedInterfaces();
+
       base.Load(builder);
     }
   }

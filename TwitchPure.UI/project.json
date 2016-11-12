@@ -1,7 +1,7 @@
 ﻿{
   "dependencies": {
     "Autofac": "3.5.2",
-    "MetroLog": "0.9.0",
+    "MetroLog": "1.0.1",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
     "Newtonsoft.Json": "7.0.1",
     "Prism.Windows": "6.0.1",
