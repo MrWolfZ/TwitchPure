@@ -12,7 +12,7 @@
     <Grid.Resources>
       <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Grid.Resources>
-    
+
     <Grid.RowDefinitions>
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
@@ -41,5 +41,13 @@
                   Height="50"
                   Width="50"
                   Visibility="{Binding IsSpinnerVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+    <TextBlock x:Uid="StreamList_ResultEmpty"
+               Grid.Row="0"
+               Margin="8 0 8 8"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               Style="{StaticResource BaseTextBlockStyle}"
+               Visibility="{Binding IsResultEmptyMessageVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
   </Grid>
 </UserControl>

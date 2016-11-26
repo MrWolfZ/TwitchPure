@@ -138,4 +138,7 @@
   <data name="Favorites_Header.Text" xml:space="preserve">
     <value>Favorites</value>
   </data>
+  <data name="StreamList_ResultEmpty.Text" xml:space="preserve">
+    <value>No live streams found</value>
+  </data>
 </root>

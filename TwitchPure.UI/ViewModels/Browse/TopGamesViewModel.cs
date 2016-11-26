@@ -25,8 +25,7 @@ namespace TwitchPure.UI.ViewModels.Browse
           var hasMore = existingCount + response.Streams.Count < response.Total;
           var vms = response.Streams.Select(dto => new StreamThumbnailViewModel(dto)).ToList();
           return new InfiniteReactiveList<StreamThumbnailViewModel>.LoadItemsAsyncResult(vms, hasMore);
-        }
-        );
+        });
     }
 
     public StreamListViewModel StreamListViewModel { get; }

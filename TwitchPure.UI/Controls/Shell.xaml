@@ -84,7 +84,7 @@
                         VerticalAlignment="Stretch"
                         ItemsSource="{Binding TopNavLinks}"
                         ItemTemplate="{StaticResource Template}"
-                        SelectionMode="{Binding TopListSelectionMode}"
+                        SelectionMode="Single"
                         SelectedItem="{Binding TopSelectedLink, Mode=TwoWay}"
                         ScrollViewer.HorizontalScrollMode="Disabled"
                         ScrollViewer.VerticalScrollMode="Disabled">
@@ -97,7 +97,7 @@
                         VerticalAlignment="Stretch"
                         ItemsSource="{Binding BottomNavLinks}"
                         ItemTemplate="{StaticResource Template}"
-                        SelectionMode="{Binding BottomListSelectionMode}"
+                        SelectionMode="Single"
                         SelectedItem="{Binding BottomSelectedLink, Mode=TwoWay}"
                         ScrollViewer.HorizontalScrollMode="Disabled"
                         ScrollViewer.VerticalScrollMode="Disabled">

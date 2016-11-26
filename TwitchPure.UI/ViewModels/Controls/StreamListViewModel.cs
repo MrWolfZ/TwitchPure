@@ -13,6 +13,7 @@ namespace TwitchPure.UI.ViewModels.Controls
   {
     private readonly CompositeDisposable disposables = new CompositeDisposable();
     private readonly ObservableAsPropertyHelper<bool> isSpinnerVisible;
+    private readonly ObservableAsPropertyHelper<bool> isResultEmptyMessageVisible;
     private StreamThumbnailViewModel selectedItem;
 
     public StreamListViewModel(
@@ -24,26 +25,36 @@ namespace TwitchPure.UI.ViewModels.Controls
       this.Streams = new InfiniteReactiveList<StreamThumbnailViewModel>(loadItemsAsync);
 
       this.disposables.Add(appLifecycle.Suspends.Subscribe(u => this.Streams.Clear()));
+      this.disposables.Add(appLifecycle.Resumes.Subscribe(u => this.Streams.Reset()));
 
       this.WhenAny(vm => vm.SelectedItem, c => c.Value)
           .FirstAsync(v => v != null)
           .Select(v => v.Source.Channel.DisplayName)
           .Subscribe(
             name =>
-            navigationService.Navigate(
-              ViewToken.Live,
-              JsonConvert.SerializeObject(new LiveNavigationArgs { TargetViewToken = ViewToken.Live, SourceViewToken = viewToken, ChannelName = name })));
+              navigationService.Navigate(
+                ViewToken.Live,
+                JsonConvert.SerializeObject(new LiveNavigationArgs { TargetViewToken = ViewToken.Live, SourceViewToken = viewToken, ChannelName = name })));
 
-      this.isSpinnerVisible = this.Streams.WhenAnyValue(s => s.Count, s => s.HasMoreItems)
+      this.isSpinnerVisible = this.Streams
+                                  .WhenAnyValue(s => s.Count, s => s.HasMoreItems)
                                   .Select(t => t.Item1 == 0 && t.Item2)
-                                  .ToProperty(this, vm => vm.IsSpinnerVisible, true, RxApp.MainThreadScheduler);
+                                  .ToProperty(this, vm => vm.IsSpinnerVisible, true);
+
+      this.isResultEmptyMessageVisible = this.Streams
+                                             .WhenAnyValue(s => s.Count, s => s.HasMoreItems)
+                                             .Select(t => t.Item1 == 0 && !t.Item2)
+                                             .ToProperty(this, vm => vm.IsResultEmptyMessageVisible);
 
       this.disposables.Add(this.isSpinnerVisible);
+      this.disposables.Add(this.isResultEmptyMessageVisible);
     }
 
     public InfiniteReactiveList<StreamThumbnailViewModel> Streams { get; }
 
     public bool IsSpinnerVisible => this.isSpinnerVisible.Value;
+
+    public bool IsResultEmptyMessageVisible => this.isResultEmptyMessageVisible.Value;
 
     public StreamThumbnailViewModel SelectedItem
     {

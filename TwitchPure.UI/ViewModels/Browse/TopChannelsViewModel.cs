@@ -25,21 +25,10 @@ namespace TwitchPure.UI.ViewModels.Browse
           var hasMore = existingCount + response.Streams.Count < response.Total;
           var vms = response.Streams.Select(dto => new StreamThumbnailViewModel(dto)).ToList();
           return new InfiniteReactiveList<StreamThumbnailViewModel>.LoadItemsAsyncResult(vms, hasMore);
-        }
-        );
+        });
     }
 
     public StreamListViewModel StreamListViewModel { get; }
-
-    public void Dispose()
-    {
-      foreach (var viewModel in this.StreamListViewModel.Streams)
-      {
-        viewModel.Dispose();
-      }
-
-      this.StreamListViewModel.Dispose();
-    }
 
     public void OnNavigatedTo(NavigatedToEventArgs e, Dictionary<string, object> viewModelState)
     {
@@ -53,6 +42,16 @@ namespace TwitchPure.UI.ViewModels.Browse
       }
 
       this.Dispose();
+    }
+
+    public void Dispose()
+    {
+      foreach (var viewModel in this.StreamListViewModel.Streams)
+      {
+        viewModel.Dispose();
+      }
+
+      this.StreamListViewModel.Dispose();
     }
   }
 }
