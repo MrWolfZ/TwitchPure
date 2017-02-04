@@ -9,7 +9,6 @@ using Windows.System.UserProfile;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Autofac;
-using Microsoft.ApplicationInsights;
 using Newtonsoft.Json;
 using Prism.Logging;
 using Prism.Mvvm;
@@ -31,7 +30,6 @@ namespace TwitchPure
     /// </summary>
     public App()
     {
-      WindowsAppInitializer.InitializeAsync(WindowsCollectors.Metadata | WindowsCollectors.Session);
       this.InitializeComponent();
     }
 

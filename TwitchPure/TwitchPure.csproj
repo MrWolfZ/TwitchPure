@@ -11,8 +11,8 @@
     <AssemblyName>TwitchPure</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.10586.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
+    <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.14393.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -97,16 +97,70 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="project.json" />
+    <PRIResource Include="Strings\en-US\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Services\ApplicationLifecycle.cs" />
+    <Compile Include="Services\Data\Twitch\ITwitchApi.cs" />
+    <Compile Include="Services\Dto\Twitch\Stream.cs" />
+    <Compile Include="Services\FavoritesService.cs" />
     <Compile Include="LoggingModule.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\ServicesModule.cs" />
+    <Compile Include="UI\ControlAttribute.cs" />
+    <Compile Include="UI\ControlRegistration.cs" />
+    <Compile Include="UI\Controls\Shell.xaml.cs">
+      <DependentUpon>Shell.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Controls\StreamList.xaml.cs">
+      <DependentUpon>StreamList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Controls\StreamThumbnail.xaml.cs">
+      <DependentUpon>StreamThumbnail.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="UI\Converters\IntegerToVisibilityConverter.cs" />
+    <Compile Include="UI\Converters\InverseBooleanToVisibilityConverter.cs" />
+    <Compile Include="UI\Converters\InverseIntegerToVisibilityConverter.cs" />
+    <Compile Include="UI\Converters\InverseNullToVisibilityConverter.cs" />
+    <Compile Include="UI\Converters\NegationConverter.cs" />
+    <Compile Include="UI\Converters\NullToBooleanConverter.cs" />
+    <Compile Include="UI\Converters\NullToVisibilityConverter.cs" />
+    <Compile Include="UI\InfiniteReactiveList.cs" />
+    <Compile Include="UI\UIModule.cs" />
+    <Compile Include="UI\ViewAttribute.cs" />
+    <Compile Include="UI\ViewModels\Browse\FavoritesViewModel.cs" />
+    <Compile Include="UI\ViewModels\Browse\TopChannelsViewModel.cs" />
+    <Compile Include="UI\ViewModels\Browse\TopGamesViewModel.cs" />
+    <Compile Include="UI\ViewModels\Controls\ShellViewModel.cs" />
+    <Compile Include="UI\ViewModels\Controls\StreamListViewModel.cs" />
+    <Compile Include="UI\ViewModels\Controls\StreamThumbnailViewModel.cs" />
+    <Compile Include="UI\ViewModels\Settings\SettingsViewModel.cs" />
+    <Compile Include="UI\ViewModels\Watch\LiveViewModel.cs" />
+    <Compile Include="UI\ViewRegistration.cs" />
+    <Compile Include="UI\Views\Browse\Favorites.xaml.cs">
+      <DependentUpon>Favorites.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\Browse\TopChannels.xaml.cs">
+      <DependentUpon>TopChannels.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\Browse\TopGames.xaml.cs">
+      <DependentUpon>TopGames.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\IViewModelAwarePage.cs" />
+    <Compile Include="UI\Views\Settings\Settings.xaml.cs">
+      <DependentUpon>Settings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\Watch\Live.xaml.cs">
+      <DependentUpon>Live.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ViewToken.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -133,16 +187,57 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI\Controls\Shell.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Controls\StreamList.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Controls\StreamThumbnail.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+    <Page Include="UI\Views\Browse\Favorites.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Views\Browse\TopChannels.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Views\Browse\TopGames.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Views\Settings\Settings.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Views\Watch\Live.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TwitchPure.Services\TwitchPure.Services.csproj">
-      <Project>{68E8BFE5-AF2B-40F4-B14B-72F68CBB02B9}</Project>
-      <Name>TwitchPure.Services</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TwitchPure.UI\TwitchPure.UI.csproj">
-      <Project>{44a6e6b1-927e-4697-b77e-cf653fbe840d}</Project>
-      <Name>TwitchPure.UI</Name>
-    </ProjectReference>
+    <SDKReference Include="BehaviorsXamlSDKManaged, Version=12.0">
+      <Name>Behaviors SDK %28XAML%29</Name>
+    </SDKReference>
+    <SDKReference Include="Microsoft.PlayerFramework.Xaml.Adaptive.UWP, Version=3.0.0.2">
+      <Name>Microsoft Player Framework Adaptive Streaming Plugin</Name>
+    </SDKReference>
+    <SDKReference Include="Microsoft.PlayerFramework.Xaml.UWP, Version=3.0.0.2">
+      <Name>Microsoft Player Framework</Name>
+    </SDKReference>
+    <SDKReference Include="Universal Smooth Streaming Client SDK, Version=1.0">
+      <Name>Microsoft Universal Smooth Streaming Client SDK</Name>
+    </SDKReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

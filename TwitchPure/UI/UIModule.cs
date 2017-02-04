@@ -12,7 +12,7 @@ namespace TwitchPure.UI
   {
     protected override void Load(ContainerBuilder builder)
     {
-      builder.Register<IResourceLoader>(c => new ResourceLoaderAdapter(ResourceLoader.GetForViewIndependentUse("TwitchPure.UI/Resources")));
+      builder.Register<IResourceLoader>(c => new ResourceLoaderAdapter(ResourceLoader.GetForViewIndependentUse()));
 
       foreach (var view in from t in this.GetType().GetTypeInfo().Assembly.GetTypes()
                            let a = t.GetTypeInfo().GetCustomAttribute<ViewAttribute>()
