@@ -9,6 +9,7 @@ using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
+using Windows.Devices.Power;
 using Windows.Foundation;
 using Windows.Graphics.Display;
 using Windows.System.Profile;
@@ -33,12 +34,16 @@ namespace TwitchPure.UI.ViewModels.Watch
     private readonly ObservableAsPropertyHelper<StreamQualityInfoCollection> qualities;
     private readonly ObservableAsPropertyHelper<bool> isCommandBarVisibile;
     private readonly ObservableAsPropertyHelper<bool> isMuted;
+    private readonly ObservableAsPropertyHelper<bool> isSleepTimerActive;
+    private readonly ObservableAsPropertyHelper<string> sleepTimerCountdown;
     private readonly ObservableAsPropertyHelper<bool> isFavorite;
+    private readonly ObservableAsPropertyHelper<string> batteryChargeLevel;
+    private readonly ObservableAsPropertyHelper<string> timeOfDay;
     private readonly TaskCompletionSource<StreamQualityInfoCollection> qualityLoad = new TaskCompletionSource<StreamQualityInfoCollection>();
     private readonly DeviceWatcher deviceWatcher;
     private string channelName;
 
-    public LiveViewModel(ILogger log, IApplicationLifecycle appLifecycle, IFavoritesService favoritesService)
+    public LiveViewModel(ILogger log, IApplicationLifecycle appLifecycle, IFavoritesService favoritesService, INavigationService navigationService)
     {
       this.log = log;
       this.favoritesService = favoritesService;
@@ -67,6 +72,7 @@ namespace TwitchPure.UI.ViewModels.Watch
 
       this.Tapped = ReactiveCommand.Create(Observable.Return(true));
       this.ToggleMute = ReactiveCommand.Create(Observable.Return(true));
+      this.ToggleSleepTimer = ReactiveCommand.Create(Observable.Return(true));
       this.ToggleFavorite = ReactiveCommand.Create(Observable.Return(true));
       this.QualityMenuOpened = ReactiveCommand.Create(Observable.Return(true));
 
@@ -74,25 +80,25 @@ namespace TwitchPure.UI.ViewModels.Watch
                                       .Select(o => !this.IsCommandBarVisibile)
                                       .Publish(
                                         pub =>
-                                        pub.SelectMany(
-                                          b =>
-                                          !b
-                                            ? Observable.Return(false)
-                                            : Observable.Return(true)
-                                                        .Concat(
-                                                          pub.Skip(1)
-                                                             .FirstAsync()
-                                                             .Amb(Observable.Timer(TimeSpan.FromSeconds(3)).Select(_ => false))
-                                                             .Amb(this.QualityMenuOpened.FirstAsync().Select(_ => true)))))
+                                          pub.SelectMany(
+                                            b =>
+                                              !b
+                                                ? Observable.Return(false)
+                                                : Observable.Return(true)
+                                                            .Concat(
+                                                              pub.Skip(1)
+                                                                 .FirstAsync()
+                                                                 .Amb(Observable.Timer(TimeSpan.FromSeconds(3)).Select(_ => false))
+                                                                 .Amb(this.QualityMenuOpened.FirstAsync().Select(_ => true)))))
                                       .ToProperty(this, vm => vm.IsCommandBarVisibile, scheduler: RxApp.MainThreadScheduler);
 
       this.deviceWatcher = DeviceInformation.CreateWatcher(DeviceClass.AudioRender);
 
       // TODO: abstract into service
       var muteOnHeadphonesRemoved = Observable.FromEventPattern<TypedEventHandler<DeviceWatcher, DeviceInformationUpdate>, DeviceInformationUpdate>(
-        h => this.deviceWatcher.Removed += h,
-        h => this.deviceWatcher.Removed -= h
-        ).Select(a => true).Publish();
+                                                h => this.deviceWatcher.Removed += h,
+                                                h => this.deviceWatcher.Removed -= h
+                                              ).Select(a => true).Publish();
 
       this.disposables.Add(muteOnHeadphonesRemoved.Connect());
 
@@ -100,6 +106,38 @@ namespace TwitchPure.UI.ViewModels.Watch
                          .Select(o => !this.IsMuted)
                          .Merge(muteOnHeadphonesRemoved)
                          .ToProperty(this, vm => vm.IsMuted, scheduler: RxApp.MainThreadScheduler);
+
+      this.isSleepTimerActive = this.ToggleSleepTimer
+                                    .Select(o => !this.IsSleepTimerActive)
+                                    .ToProperty(this, vm => vm.IsSleepTimerActive, scheduler: RxApp.MainThreadScheduler);
+
+      // TODO: make choosable via UI
+      var sleepTimerDuration = TimeSpan.FromMinutes(30);
+      var sleepTimerTriggered = this.WhenAnyValue(vm => vm.IsSleepTimerActive)
+                                    .Select(b => b ? Observable.Timer(sleepTimerDuration) : Observable.Never<long>())
+                                    .Switch();
+
+      this.disposables.Add(sleepTimerTriggered.ObserveOn(RxApp.MainThreadScheduler).Subscribe(l => navigationService.GoBack()));
+
+      this.sleepTimerCountdown = this.WhenAnyValue(vm => vm.IsSleepTimerActive)
+                                     .Select(
+                                       b =>
+                                       {
+                                         if (b)
+                                         {
+                                           // 1s offset since we want to round up for time display
+                                           var targetTime = DateTime.Now + sleepTimerDuration + TimeSpan.FromSeconds(1);
+                                           return Observable.Interval(TimeSpan.FromMilliseconds(100))
+                                                            .Select(l => targetTime - DateTime.Now)
+                                                            .Select(t => t.ToString(@"mm\:ss"));
+                                         }
+
+                                         return Observable.Never<string>();
+                                       })
+                                     .Switch()
+                                     .ToProperty(this, vm => vm.SleepTimerCountdown, scheduler: RxApp.MainThreadScheduler);
+
+      this.disposables.Add(this.sleepTimerCountdown);
 
       this.isFavorite = this.ToggleFavorite
                             .Select(o => !this.IsFavorite)
@@ -115,16 +153,38 @@ namespace TwitchPure.UI.ViewModels.Watch
       this.disposables.Add(favoriteChanges.Where(b => b).Select(b => this.channelName).Subscribe(favoritesService.AddChannelToFavorites));
       this.disposables.Add(favoriteChanges.Where(b => !b).Select(b => this.channelName).Subscribe(favoritesService.RemoveChannelFromFavorites));
 
+      var battery = Battery.AggregateBattery;
+      var batteryReportsUpdated = Observable.FromEventPattern<TypedEventHandler<Battery, object>, Battery, object>(
+        h => battery.ReportUpdated += h,
+        h => battery.ReportUpdated -= h);
+
+      this.batteryChargeLevel = batteryReportsUpdated.Select(args => args.Sender)
+                                                     .StartWith(battery)
+                                                     .Select(b => b.GetReport())
+                                                     .Select(r => r.RemainingCapacityInMilliwattHours / (double?)r.FullChargeCapacityInMilliwattHours)
+                                                     .Select(l => (l ?? 1) * 100)
+                                                     .Select(l => $"{Math.Round(l)}%")
+                                                     .ToProperty(this, vm => vm.BatteryChargeLevel, scheduler: RxApp.MainThreadScheduler);
+
+      this.timeOfDay = Observable.Interval(TimeSpan.FromSeconds(1))
+                                 .StartWith(0)
+                                 .Select(l => DateTime.Now.ToString("h:mm tt"))
+                                 .ToProperty(this, vm => vm.TimeOfDay, scheduler: RxApp.MainThreadScheduler);
+
       this.disposables.Add(this.mediaUri);
       this.disposables.Add(this.volume);
       this.disposables.Add(this.qualities);
       this.disposables.Add(this.isCommandBarVisibile);
       this.disposables.Add(this.isMuted);
+      this.disposables.Add(this.isSleepTimerActive);
       this.disposables.Add(this.isFavorite);
+      this.disposables.Add(this.batteryChargeLevel);
+      this.disposables.Add(this.timeOfDay);
     }
 
     public ReactiveCommand<object> Tapped { get; }
     public ReactiveCommand<object> ToggleMute { get; }
+    public ReactiveCommand<object> ToggleSleepTimer { get; }
     public ReactiveCommand<object> ToggleFavorite { get; }
     public ReactiveCommand<object> QualityMenuOpened { get; }
     public IObservable<QualityType> SelectedQualityType { get; }
@@ -133,7 +193,11 @@ namespace TwitchPure.UI.ViewModels.Watch
     public Uri MediaUri => this.mediaUri.Value;
     public bool IsCommandBarVisibile => this.isCommandBarVisibile.Value;
     public double Volume => this.volume.Value;
+    public string BatteryChargeLevel => this.batteryChargeLevel.Value;
+    public string TimeOfDay => this.timeOfDay.Value;
     public bool IsMuted => this.isMuted.Value;
+    public bool IsSleepTimerActive => this.isSleepTimerActive.Value;
+    public string SleepTimerCountdown => this.sleepTimerCountdown.Value;
     public bool IsFavorite => this.isFavorite.Value;
 
     public void Dispose() => this.disposables.Dispose();
@@ -199,40 +263,40 @@ namespace TwitchPure.UI.ViewModels.Watch
       var res2 = await c.GetStringAsync(url);
 
       var infos = regex.Matches(res2).Cast<Match>().SelectMany(
-        m =>
-        {
-          try
-          {
-            var quality = m.Groups[1].Value.Replace(" ", "");
+                         m =>
+                         {
+                           try
+                           {
+                             var quality = m.Groups[1].Value.Replace(" ", "");
 
-            if (quality == "1080p60")
-            {
-              quality = "Source";
-            }
-            else if (quality == "720p60")
-            {
-              quality = "High";
-            }
-            else if (quality == "540p30")
-            {
-              quality = "Medium";
-            }
+                             if (quality == "1080p60")
+                             {
+                               quality = "Source";
+                             }
+                             else if (quality == "720p60")
+                             {
+                               quality = "High";
+                             }
+                             else if (quality == "540p30")
+                             {
+                               quality = "Medium";
+                             }
 
-            return new[]
-            {
-              new QualityInfo
-              {
-                Type = (QualityType)Enum.Parse(typeof(QualityType), quality),
-                Url = m.Groups[2].Value
-              }
-            };
-          }
+                             return new[]
+                             {
+                               new QualityInfo
+                               {
+                                 Type = (QualityType)Enum.Parse(typeof(QualityType), quality),
+                                 Url = m.Groups[2].Value
+                               }
+                             };
+                           }
 
-          catch (Exception)
-          {
-            return Enumerable.Empty<QualityInfo>();
-          }
-        }).ToList();
+                           catch (Exception)
+                           {
+                             return Enumerable.Empty<QualityInfo>();
+                           }
+                         }).ToList();
 
       return new StreamQualityInfoCollection(infos, infos[0]);
     }

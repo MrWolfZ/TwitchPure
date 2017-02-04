@@ -64,6 +64,12 @@ namespace TwitchPure.UI
       }
     }
 
+    public override void Reset()
+    {
+      this.HasMoreItems = true;
+      base.Reset();
+    }
+
     public sealed class LoadItemsAsyncResult
     {
       public LoadItemsAsyncResult(ICollection<T> items, bool hasMoreItems)

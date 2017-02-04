@@ -54,7 +54,7 @@
       <Grid.RowDefinitions>
         <RowDefinition Height="*" />
       </Grid.RowDefinitions>
-      
+
       <interactivity:Interaction.Behaviors>
         <core:EventTriggerBehavior EventName="Tapped">
           <core:InvokeCommandAction Command="{Binding Tapped}" />
@@ -108,11 +108,29 @@
           </core:DataTriggerBehavior>
         </interactivity:Interaction.Behaviors>
 
-        <AppBarButton Icon="Mute" IsCompact="True" Command="{Binding ToggleMute}" 
+        <CommandBar.Content>
+          <StackPanel Orientation="Horizontal" Padding="4">
+            <StackPanel>
+              <TextBlock Text="{Binding BatteryChargeLevel}" />
+              <TextBlock Text="{Binding TimeOfDay}" />
+            </StackPanel>
+            <Border BorderThickness="1" Height="Auto" VerticalAlignment="Stretch" Margin="4 0"
+                    Visibility="{Binding IsSleepTimerActive, Converter={StaticResource BooleanToVisibilityConverter}}">
+              <Border.BorderBrush>
+                <SolidColorBrush Color="{StaticResource SystemBaseHighColor}" />
+              </Border.BorderBrush>
+            </Border>
+            <TextBlock Text="{Binding SleepTimerCountdown}"
+                       Visibility="{Binding IsSleepTimerActive, Converter={StaticResource BooleanToVisibilityConverter}}" />
+          </StackPanel>
+        </CommandBar.Content>
+
+        <AppBarToggleButton Icon="Clock" IsCompact="True" Command="{Binding ToggleSleepTimer}" />
+        <AppBarButton Icon="Mute" IsCompact="True" Command="{Binding ToggleMute}"
                       Visibility="{Binding IsMuted, Converter={StaticResource BooleanToVisibilityConverter}}" />
         <AppBarButton Icon="Volume" IsCompact="True" Command="{Binding ToggleMute}"
                       Visibility="{Binding IsMuted, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
-        <AppBarButton Icon="Favorite" IsCompact="True" Command="{Binding ToggleFavorite}" 
+        <AppBarButton Icon="Favorite" IsCompact="True" Command="{Binding ToggleFavorite}"
                       Visibility="{Binding IsFavorite, Converter={StaticResource BooleanToVisibilityConverter}}" />
         <AppBarButton Icon="OutlineStar" IsCompact="True" Command="{Binding ToggleFavorite}"
                       Visibility="{Binding IsFavorite, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
@@ -153,7 +171,7 @@
             </MenuFlyout>
           </AppBarButton.Flyout>
         </AppBarButton>
-        <AppBarButton Icon="Setting" IsCompact="True" />
+        <AppBarButton Icon="Setting" IsCompact="True" Visibility="Collapsed" />
       </CommandBar>
     </StackPanel>
   </Grid>

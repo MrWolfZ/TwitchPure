@@ -53,7 +53,7 @@ namespace TwitchPure
       else if (args.PreviousExecutionState == ApplicationExecutionState.NotRunning || args.PreviousExecutionState == ApplicationExecutionState.ClosedByUser)
       {
         // Navigate to the initial page
-        const string InitialPage = ViewToken.TopChannels;
+        const string InitialPage = ViewToken.Favorites;
         this.NavigationService.Navigate(InitialPage, JsonConvert.SerializeObject(new NavigationArgs { TargetViewToken = InitialPage }));
       }
 
