@@ -1,4 +1,5 @@
 ﻿using TwitchPure.UI.ViewModels.Browse;
+using UWP.Base;
 
 namespace TwitchPure.UI.Views.Browse
 {

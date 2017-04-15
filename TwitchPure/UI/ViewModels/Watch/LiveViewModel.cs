@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Net.Http;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.Serialization;
@@ -14,6 +14,7 @@ using Windows.Foundation;
 using Windows.Graphics.Display;
 using Windows.System.Profile;
 using Windows.UI.ViewManagement;
+using Windows.UI.Xaml;
 using MetroLog;
 using Newtonsoft.Json;
 using Prism.Windows.Navigation;
@@ -31,7 +32,7 @@ namespace TwitchPure.UI.ViewModels.Watch
     private readonly CompositeDisposable disposables = new CompositeDisposable();
     private readonly ObservableAsPropertyHelper<Uri> mediaUri;
     private readonly ObservableAsPropertyHelper<double> volume;
-    private readonly ObservableAsPropertyHelper<StreamQualityInfoCollection> qualities;
+    private readonly ObservableAsPropertyHelper<List<QualityInfo>> qualities;
     private readonly ObservableAsPropertyHelper<bool> isCommandBarVisibile;
     private readonly ObservableAsPropertyHelper<bool> isMuted;
     private readonly ObservableAsPropertyHelper<bool> isSleepTimerActive;
@@ -39,42 +40,41 @@ namespace TwitchPure.UI.ViewModels.Watch
     private readonly ObservableAsPropertyHelper<bool> isFavorite;
     private readonly ObservableAsPropertyHelper<string> batteryChargeLevel;
     private readonly ObservableAsPropertyHelper<string> timeOfDay;
-    private readonly TaskCompletionSource<StreamQualityInfoCollection> qualityLoad = new TaskCompletionSource<StreamQualityInfoCollection>();
+    private readonly TaskCompletionSource<List<QualityInfo>> qualityLoad = new TaskCompletionSource<List<QualityInfo>>();
     private readonly DeviceWatcher deviceWatcher;
     private string channelName;
 
-    public LiveViewModel(ILogger log, IApplicationLifecycle appLifecycle, IFavoritesService favoritesService, INavigationService navigationService)
+    public LiveViewModel(ILogger log, IApplicationLifecycle appLifecycle, IFavoritesService favoritesService)
     {
       this.log = log;
       this.favoritesService = favoritesService;
 
       this.qualities = Observable.FromAsync(() => this.qualityLoad.Task)
-                                 .Catch((Exception ex) => Observable.Never<StreamQualityInfoCollection>())
+                                 .Catch((Exception ex) => Observable.Never<List<QualityInfo>>())
                                  .ToProperty(this, vm => vm.Qualities, scheduler: RxApp.MainThreadScheduler);
 
       var suspendsAndResumes = appLifecycle.Suspends.Select(u => false)
                                            .Merge(appLifecycle.Resumes.Select(u => true))
                                            .StartWith(true);
+      
+      this.SetSelectedQualityType = ReactiveCommand.Create<QualityInfo, QualityInfo>(i => i);
+      this.SelectedQualityType = this.WhenAnyValue(vm => vm.Qualities)
+                                     .Where(col => col != null)
+                                     .Select(col => col[0])
+                                     .FirstAsync()
+                                     .Concat(this.SetSelectedQualityType);
 
-      this.mediaUri = this.WhenAnyValue(vm => vm.Qualities)
-                          .Where(col => col != null)
-                          .Select(col => col.SelectedQuality)
+      this.mediaUri = this.WhenAnyValue(vm => vm.SelectedQualityType)
                           .Switch()
                           .Select(info => new Uri(info.Url))
                           .CombineLatest(suspendsAndResumes, (uri, b) => b ? uri : null)
                           .ToProperty(this, x => x.MediaUri, scheduler: RxApp.MainThreadScheduler);
 
-      this.SelectedQualityType = this.WhenAnyValue(vm => vm.Qualities)
-                                     .Where(col => col != null)
-                                     .Select(col => col.SelectedQuality)
-                                     .Switch()
-                                     .Select(info => info.Type);
-
-      this.Tapped = ReactiveCommand.Create(Observable.Return(true));
-      this.ToggleMute = ReactiveCommand.Create(Observable.Return(true));
-      this.ToggleSleepTimer = ReactiveCommand.Create(Observable.Return(true));
-      this.ToggleFavorite = ReactiveCommand.Create(Observable.Return(true));
-      this.QualityMenuOpened = ReactiveCommand.Create(Observable.Return(true));
+      this.Tapped = ReactiveCommand.Create<Unit>(a => { });
+      this.ToggleMute = ReactiveCommand.Create<Unit>(a => { });
+      this.ToggleSleepTimer = ReactiveCommand.Create<Unit>(a => { });
+      this.ToggleFavorite = ReactiveCommand.Create<Unit>(a => { });
+      this.QualityMenuOpened = ReactiveCommand.Create<Unit>(a => { });
 
       this.isCommandBarVisibile = this.Tapped
                                       .Select(o => !this.IsCommandBarVisibile)
@@ -96,9 +96,9 @@ namespace TwitchPure.UI.ViewModels.Watch
 
       // TODO: abstract into service
       var muteOnHeadphonesRemoved = Observable.FromEventPattern<TypedEventHandler<DeviceWatcher, DeviceInformationUpdate>, DeviceInformationUpdate>(
-                                                h => this.deviceWatcher.Removed += h,
-                                                h => this.deviceWatcher.Removed -= h
-                                              ).Select(a => true).Publish();
+        h => this.deviceWatcher.Removed += h,
+        h => this.deviceWatcher.Removed -= h
+      ).Select(a => true).Publish();
 
       this.disposables.Add(muteOnHeadphonesRemoved.Connect());
 
@@ -117,7 +117,7 @@ namespace TwitchPure.UI.ViewModels.Watch
                                     .Select(b => b ? Observable.Timer(sleepTimerDuration) : Observable.Never<long>())
                                     .Switch();
 
-      this.disposables.Add(sleepTimerTriggered.ObserveOn(RxApp.MainThreadScheduler).Subscribe(l => navigationService.GoBack()));
+      this.disposables.Add(sleepTimerTriggered.ObserveOn(RxApp.MainThreadScheduler).Subscribe(l => Application.Current.Exit()));
 
       this.sleepTimerCountdown = this.WhenAnyValue(vm => vm.IsSleepTimerActive)
                                      .Select(
@@ -182,13 +182,14 @@ namespace TwitchPure.UI.ViewModels.Watch
       this.disposables.Add(this.timeOfDay);
     }
 
-    public ReactiveCommand<object> Tapped { get; }
-    public ReactiveCommand<object> ToggleMute { get; }
-    public ReactiveCommand<object> ToggleSleepTimer { get; }
-    public ReactiveCommand<object> ToggleFavorite { get; }
-    public ReactiveCommand<object> QualityMenuOpened { get; }
-    public IObservable<QualityType> SelectedQualityType { get; }
-    public StreamQualityInfoCollection Qualities => this.qualities.Value;
+    public ReactiveCommand<Unit, Unit> Tapped { get; }
+    public ReactiveCommand<Unit, Unit> ToggleMute { get; }
+    public ReactiveCommand<Unit, Unit> ToggleSleepTimer { get; }
+    public ReactiveCommand<Unit, Unit> ToggleFavorite { get; }
+    public ReactiveCommand<Unit, Unit> QualityMenuOpened { get; }
+    public ReactiveCommand<QualityInfo, QualityInfo> SetSelectedQualityType { get; }
+    public IObservable<QualityInfo> SelectedQualityType { get; }
+    public List<QualityInfo> Qualities => this.qualities.Value;
 
     public Uri MediaUri => this.mediaUri.Value;
     public bool IsCommandBarVisibile => this.isCommandBarVisibile.Value;
@@ -223,7 +224,7 @@ namespace TwitchPure.UI.ViewModels.Watch
 
       if (isFav != this.IsFavorite)
       {
-        this.ToggleFavorite.Execute(isFav);
+        this.ToggleFavorite.Execute().Subscribe();
       }
 
       Observable.FromAsync(() => GetQualities(args.ChannelName)).Subscribe(this.qualityLoad.SetResult);
@@ -244,7 +245,7 @@ namespace TwitchPure.UI.ViewModels.Watch
       this.Dispose();
     }
 
-    private static async Task<StreamQualityInfoCollection> GetQualities(string channel)
+    private static async Task<List<QualityInfo>> GetQualities(string channel)
     {
       channel = channel.ToLowerInvariant();
 
@@ -262,43 +263,15 @@ namespace TwitchPure.UI.ViewModels.Watch
 
       var res2 = await c.GetStringAsync(url);
 
-      var infos = regex.Matches(res2).Cast<Match>().SelectMany(
-                         m =>
-                         {
-                           try
-                           {
-                             var quality = m.Groups[1].Value.Replace(" ", "");
-
-                             if (quality == "1080p60")
-                             {
-                               quality = "Source";
-                             }
-                             else if (quality == "720p60")
-                             {
-                               quality = "High";
-                             }
-                             else if (quality == "540p30")
-                             {
-                               quality = "Medium";
-                             }
-
-                             return new[]
-                             {
-                               new QualityInfo
-                               {
-                                 Type = (QualityType)Enum.Parse(typeof(QualityType), quality),
-                                 Url = m.Groups[2].Value
-                               }
-                             };
-                           }
-
-                           catch (Exception)
-                           {
-                             return Enumerable.Empty<QualityInfo>();
-                           }
-                         }).ToList();
-
-      return new StreamQualityInfoCollection(infos, infos[0]);
+      return regex.Matches(res2).Cast<Match>().SelectMany(
+        m => new[]
+        {
+          new QualityInfo
+          {
+            Type = m.Groups[1].Value.Replace(" ", ""),
+            Url = m.Groups[2].Value
+          }
+        }).ToList();
     }
 
     [JsonObject]
@@ -319,83 +292,9 @@ namespace TwitchPure.UI.ViewModels.Watch
     public string ChannelName { get; set; }
   }
 
-  public sealed class StreamQualityInfoCollection : ReactiveObject
-  {
-    private readonly ICollection<QualityInfo> availableQualities;
-    private readonly ObservableAsPropertyHelper<bool> isSourceSelected;
-    private readonly ObservableAsPropertyHelper<bool> isHighSelected;
-    private readonly ObservableAsPropertyHelper<bool> isMediumSelected;
-    private readonly ObservableAsPropertyHelper<bool> isLowSelected;
-    private readonly ObservableAsPropertyHelper<bool> isMobileSelected;
-    private readonly ObservableAsPropertyHelper<bool> isAudioOnlySelected;
-
-    public StreamQualityInfoCollection(IEnumerable<QualityInfo> availableQualities, QualityInfo initialSelected)
-    {
-      this.availableQualities = availableQualities.ToList();
-
-      this.SetSelectedQuality = ReactiveCommand.CreateAsyncObservable(p => Observable.Return((QualityInfo)p));
-      this.SelectedQuality = this.SetSelectedQuality.StartWith(initialSelected);
-
-      this.SetUpType(QualityType.Source, initialSelected.Type, col => col.IsSourceSelected, out this.isSourceSelected);
-      this.SetUpType(QualityType.High, initialSelected.Type, col => col.IsHighSelected, out this.isHighSelected);
-      this.SetUpType(QualityType.Medium, initialSelected.Type, col => col.IsMediumSelected, out this.isMediumSelected);
-      this.SetUpType(QualityType.Low, initialSelected.Type, col => col.IsLowSelected, out this.isLowSelected);
-      this.SetUpType(QualityType.Mobile, initialSelected.Type, col => col.IsMobileSelected, out this.isMobileSelected);
-      this.SetUpType(QualityType.AudioOnly, initialSelected.Type, col => col.IsAudioOnlySelected, out this.isAudioOnlySelected);
-    }
-
-    public ReactiveCommand<QualityInfo> SetSelectedQuality { get; }
-    public IObservable<QualityInfo> SelectedQuality { get; }
-
-    public bool IsSourceVisible => this.availableQualities.Any(info => info.Type == QualityType.Source);
-    public QualityInfo Source => this.availableQualities.SingleOrDefault(info => info.Type == QualityType.Source);
-    public bool IsSourceSelected => this.isSourceSelected.Value;
-
-    public bool IsHighVisible => this.availableQualities.Any(info => info.Type == QualityType.High);
-    public QualityInfo High => this.availableQualities.SingleOrDefault(info => info.Type == QualityType.High);
-    public bool IsHighSelected => this.isHighSelected.Value;
-
-    public bool IsMediumVisible => this.availableQualities.Any(info => info.Type == QualityType.Medium);
-    public QualityInfo Medium => this.availableQualities.SingleOrDefault(info => info.Type == QualityType.Medium);
-    public bool IsMediumSelected => this.isMediumSelected.Value;
-
-    public bool IsLowVisible => this.availableQualities.Any(info => info.Type == QualityType.Low);
-    public QualityInfo Low => this.availableQualities.SingleOrDefault(info => info.Type == QualityType.Low);
-    public bool IsLowSelected => this.isLowSelected.Value;
-
-    public bool IsMobileVisible => this.availableQualities.Any(info => info.Type == QualityType.Mobile);
-    public QualityInfo Mobile => this.availableQualities.SingleOrDefault(info => info.Type == QualityType.Mobile);
-    public bool IsMobileSelected => this.isMobileSelected.Value;
-
-    public bool IsAudioOnlyVisible => this.availableQualities.Any(info => info.Type == QualityType.AudioOnly);
-    public QualityInfo AudioOnly => this.availableQualities.SingleOrDefault(info => info.Type == QualityType.AudioOnly);
-    public bool IsAudioOnlySelected => this.isAudioOnlySelected.Value;
-
-    private void SetUpType(
-      QualityType type,
-      QualityType initial,
-      Expression<Func<StreamQualityInfoCollection, bool>> isSelectedProp,
-      out ObservableAsPropertyHelper<bool> isSelectedField)
-    {
-      this.SelectedQuality
-          .Select(info => info.Type == type)
-          .ToProperty(this, isSelectedProp, out isSelectedField, initial == type, RxApp.MainThreadScheduler);
-    }
-  }
-
-  public enum QualityType
-  {
-    Source = 1,
-    High = 2,
-    Medium = 3,
-    Low = 4,
-    Mobile = 5,
-    AudioOnly = 6
-  }
-
   public sealed class QualityInfo
   {
-    public QualityType Type { get; set; }
+    public string Type { get; set; }
     public string Url { get; set; }
   }
 }

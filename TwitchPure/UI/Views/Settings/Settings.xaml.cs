@@ -1,4 +1,5 @@
 ﻿using TwitchPure.UI.ViewModels.Settings;
+using UWP.Base;
 
 namespace TwitchPure.UI.Views.Settings
 {

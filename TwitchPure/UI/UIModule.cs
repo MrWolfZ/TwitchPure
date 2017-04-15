@@ -4,6 +4,7 @@ using Windows.ApplicationModel.Resources;
 using Autofac;
 using Prism.Windows.AppModel;
 using TwitchPure.UI.ViewModels.Controls;
+using UWP.Base;
 using Module = Autofac.Module;
 
 namespace TwitchPure.UI

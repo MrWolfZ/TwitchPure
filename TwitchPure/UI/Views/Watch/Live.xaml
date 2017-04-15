@@ -31,7 +31,7 @@
         </Setter>
       </Style>
       <Style x:Key="FlyoutMenuStyle" BasedOn="{StaticResource CustomMenuFlyoutPresenterStyle}" TargetType="MenuFlyoutPresenter">
-        <Setter Property="MaxWidth" Value="150" />
+        <Setter Property="MaxWidth" Value="200" />
         <Setter Property="Background">
           <Setter.Value>
             <SolidColorBrush Color="{StaticResource SystemAltHighColor}" Opacity="0.5" />
@@ -111,8 +111,8 @@
         <CommandBar.Content>
           <StackPanel Orientation="Horizontal" Padding="4">
             <StackPanel>
-              <TextBlock Text="{Binding BatteryChargeLevel}" />
-              <TextBlock Text="{Binding TimeOfDay}" />
+              <TextBlock Text="{Binding TimeOfDay}" FontSize="11" />
+              <TextBlock Text="{Binding BatteryChargeLevel}" FontSize="11" />
             </StackPanel>
             <Border BorderThickness="1" Height="Auto" VerticalAlignment="Stretch" Margin="4 0"
                     Visibility="{Binding IsSleepTimerActive, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -120,7 +120,7 @@
                 <SolidColorBrush Color="{StaticResource SystemBaseHighColor}" />
               </Border.BorderBrush>
             </Border>
-            <TextBlock Text="{Binding SleepTimerCountdown}"
+            <TextBlock Text="{Binding SleepTimerCountdown}" FontSize="11"
                        Visibility="{Binding IsSleepTimerActive, Converter={StaticResource BooleanToVisibilityConverter}}" />
           </StackPanel>
         </CommandBar.Content>
@@ -137,38 +137,7 @@
         <AppBarButton Icon="Video" IsCompact="True" IsEnabled="{Binding Qualities, Converter={StaticResource NullToBooleanConverter}}"
                       Command="{Binding QualityMenuOpened}">
           <AppBarButton.Flyout>
-            <MenuFlyout MenuFlyoutPresenterStyle="{StaticResource FlyoutMenuStyle}" Placement="Bottom">
-              <ToggleMenuFlyoutItem x:Name="SourceQualityMenuItem"
-                                    Visibility="{Binding Qualities.IsSourceVisible, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
-                                    Text="Source"
-                                    Command="{Binding Qualities.SetSelectedQuality}"
-                                    CommandParameter="{Binding Qualities.Source}" />
-              <ToggleMenuFlyoutItem x:Name="HighQualityMenuItem"
-                                    Visibility="{Binding Qualities.IsHighVisible, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
-                                    Text="High"
-                                    Command="{Binding Qualities.SetSelectedQuality}"
-                                    CommandParameter="{Binding Qualities.High}" />
-              <ToggleMenuFlyoutItem x:Name="MediumQualityMenuItem"
-                                    Visibility="{Binding Qualities.IsMediumVisible, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
-                                    Text="Medium"
-                                    Command="{Binding Qualities.SetSelectedQuality}"
-                                    CommandParameter="{Binding Qualities.Medium}" />
-              <ToggleMenuFlyoutItem x:Name="LowQualityMenuItem"
-                                    Visibility="{Binding Qualities.IsLowVisible, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
-                                    Text="Low"
-                                    Command="{Binding Qualities.SetSelectedQuality}"
-                                    CommandParameter="{Binding Qualities.Low}" />
-              <ToggleMenuFlyoutItem x:Name="MobileQualityMenuItem"
-                                    Visibility="{Binding Qualities.IsMobileVisible, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
-                                    Text="Mobile"
-                                    Command="{Binding Qualities.SetSelectedQuality}"
-                                    CommandParameter="{Binding Qualities.Mobile}" />
-              <ToggleMenuFlyoutItem x:Name="AudioOnlyQualityMenuItem"
-                                    Visibility="{Binding Qualities.IsAudioOnlyVisible, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
-                                    Text="Audio Only"
-                                    Command="{Binding Qualities.SetSelectedQuality}"
-                                    CommandParameter="{Binding Qualities.AudioOnly}" />
-            </MenuFlyout>
+            <MenuFlyout x:Name="QualityMenuFlyout" MenuFlyoutPresenterStyle="{StaticResource FlyoutMenuStyle}" Placement="Bottom" />
           </AppBarButton.Flyout>
         </AppBarButton>
         <AppBarButton Icon="Setting" IsCompact="True" Visibility="Collapsed" />

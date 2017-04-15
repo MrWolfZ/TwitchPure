@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="73e2e976-f394-4aee-a0a0-625ef094c9d2" Publisher="CN=Joe" Version="0.1.0.0" />
-  <mp:PhoneIdentity PhoneProductId="73e2e976-f394-4aee-a0a0-625ef094c9d2" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <Identity Name="73e2e976-f394-4aee-a0a0-625ef094c9d2" Publisher="CN=Joe" Version="0.2.0.0" />
+  <mp:PhoneIdentity PhoneProductId="bb54da8a-dbde-4dab-815c-600051748845" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>TwitchPure</DisplayName>
     <PublisherDisplayName>Jonathan Ziller</PublisherDisplayName>

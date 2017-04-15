@@ -1,0 +1,3 @@
+[submodule "UWP.Base"]
+	path = UWP.Base
+	url = https://github.com/MrWolfZ/UWP.Base.git

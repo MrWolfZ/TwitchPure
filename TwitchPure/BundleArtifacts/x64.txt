@@ -1,2 +1,0 @@
-MainPackage=C:\Programming\TwitchPure\TwitchPure\bin\x64\Release\TwitchPure_0.1.0.0_x64.appx
-SymbolPackage=C:\Programming\TwitchPure\TwitchPure\AppPackages\TwitchPure_0.1.0.0_Test\TwitchPure_0.1.0.0_x64.appxsym

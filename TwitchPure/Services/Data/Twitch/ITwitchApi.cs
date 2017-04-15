@@ -17,7 +17,7 @@ namespace TwitchPure.Services.Data.Twitch
     {
       var c = new HttpClient();
       c.DefaultRequestHeaders.Add("Client-ID", "lsx8xunzjbcx15nwhjrjwbw7ryn81uv");
-      var url = $"https://api.twitch.tv/kraken/streams?limit={limit}&offset={offset}&language=en";
+      var url = $"https://api.twitch.tv/kraken/streams?limit={limit}&offset={offset}";
       if (channels != null)
       {
         url = $"{url}&channel={string.Join(",", channels)}";
