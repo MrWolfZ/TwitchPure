@@ -8,7 +8,7 @@
                 xmlns:mvvm="using:Prism.Windows.Mvvm"
                 xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
                 xmlns:core="using:Microsoft.Xaml.Interactions.Core"
-                xmlns:converters="using:TwitchPure.UI.Converters"
+                xmlns:converters="using:UWP.Base.Converters"
                 mc:Ignorable="d"
                 d:DataContext="{d:DesignInstance viewModels:ShellViewModel}"
                 mvvm:ViewModelLocator.AutoWireViewModel="True">

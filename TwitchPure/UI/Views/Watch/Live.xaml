@@ -7,10 +7,10 @@
       xmlns:watch="using:TwitchPure.UI.ViewModels.Watch"
       xmlns:playerFramework="using:Microsoft.PlayerFramework"
       xmlns:adaptive="using:Microsoft.PlayerFramework.Adaptive"
-      xmlns:converters="using:TwitchPure.UI.Converters"
       xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
       xmlns:core="using:Microsoft.Xaml.Interactions.Core"
       xmlns:media="using:Microsoft.Xaml.Interactions.Media"
+      xmlns:converters="using:UWP.Base.Converters"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance watch:LiveViewModel}"
       mvvm:ViewModelLocator.AutoWireViewModel="True">

@@ -4,7 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="using:TwitchPure.UI.ViewModels.Controls"
-             xmlns:converters="using:TwitchPure.UI.Converters"
+             xmlns:converters="using:UWP.Base.Converters"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:StreamThumbnailViewModel}">
   <UserControl.Resources>

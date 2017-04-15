@@ -4,8 +4,8 @@ using System.Reactive.Linq;
 using Newtonsoft.Json;
 using Prism.Windows.Navigation;
 using ReactiveUI;
-using TwitchPure.Services;
 using TwitchPure.UI.ViewModels.Watch;
+using UWP.Base;
 
 namespace TwitchPure.UI.ViewModels.Controls
 {

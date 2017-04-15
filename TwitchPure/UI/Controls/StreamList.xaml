@@ -5,7 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="using:TwitchPure.UI.ViewModels.Controls"
              xmlns:controls="using:TwitchPure.UI.Controls"
-             xmlns:converters="using:TwitchPure.UI.Converters"
+             xmlns:converters="using:UWP.Base.Converters"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:StreamListViewModel}">
   <Grid>

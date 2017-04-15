@@ -4,7 +4,7 @@ using UWP.Base;
 namespace TwitchPure.UI.Views.Browse
 {
   [View(ViewToken.TopGames, typeof(TopGamesViewModel))]
-  public sealed partial class TopGames : IViewModelAwarePage<TopGamesViewModel>
+  public sealed partial class TopGames
   {
     public TopGames()
     {

@@ -10,9 +10,6 @@ namespace TwitchPure.Services
       builder.RegisterType<TwitchApi>()
              .AsImplementedInterfaces();
 
-      builder.RegisterType<ApplicationLifecycle>()
-             .AsImplementedInterfaces();
-
       builder.RegisterType<FavoritesService>()
              .AsImplementedInterfaces();
 

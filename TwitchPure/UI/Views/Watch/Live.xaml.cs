@@ -12,7 +12,7 @@ using UWP.Base;
 namespace TwitchPure.UI.Views.Watch
 {
   [View(ViewToken.Live, typeof(LiveViewModel))]
-  public sealed partial class Live : IViewModelAwarePage<LiveViewModel>
+  public sealed partial class Live
   {
     private readonly CompositeDisposable disposable = new CompositeDisposable();
 

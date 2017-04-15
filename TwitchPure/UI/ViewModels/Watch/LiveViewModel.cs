@@ -20,7 +20,8 @@ using Newtonsoft.Json;
 using Prism.Windows.Navigation;
 using ReactiveUI;
 using TwitchPure.Services;
-using TwitchPure.UI.ViewModels.Controls;
+using UWP.Base;
+using NavigationArgs = TwitchPure.UI.ViewModels.Controls.NavigationArgs;
 
 namespace TwitchPure.UI.ViewModels.Watch
 {
