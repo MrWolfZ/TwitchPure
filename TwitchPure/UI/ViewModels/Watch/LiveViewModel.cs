@@ -228,7 +228,7 @@ namespace TwitchPure.UI.ViewModels.Watch
         this.ToggleFavorite.Execute().Subscribe();
       }
 
-      Observable.FromAsync(() => GetQualities(args.ChannelName)).Subscribe(this.qualityLoad.SetResult);
+      Observable.FromAsync(() => GetQualities(args.ChannelName)).Subscribe(this.qualityLoad.SetResult, ex => this.log.Error("An error occurred.", ex));
     }
 
     public void OnNavigatingFrom(NavigatingFromEventArgs e, Dictionary<string, object> viewModelState, bool suspending)
